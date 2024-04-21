@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using smartkantin.Models;
+using smartkantin.Repository;
 
 namespace smartkantin.Controllers;
 
@@ -6,9 +8,17 @@ namespace smartkantin.Controllers;
 [Route("/api/public/food")]
 public class FoodMenuController : ControllerBase
 {
-    [HttpGet]
-    public string GetTopMenu()
+    private readonly IFoodRepository foodRepository;
+
+    public FoodMenuController(IFoodRepository foodRepository)
     {
-        return " get top ";
+        this.foodRepository = foodRepository;
+    }
+
+    [HttpGet]
+    public async Task<IEnumerable<Food>> GetTopMenu()
+    {
+        var result = await foodRepository.GetAll();
+        return result;
     }
 }

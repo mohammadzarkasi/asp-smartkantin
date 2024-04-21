@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using smartkantin.Repository;
 
 namespace smartkantin.Controllers.Vendor;
 
@@ -6,6 +7,12 @@ namespace smartkantin.Controllers.Vendor;
 [Route("/api/vendor/food")]
 public class VendorFoodMenuController : ControllerBase
 {
+    private readonly IFoodRepository foodRepository;
+
+    public VendorFoodMenuController(IFoodRepository foodRepository)
+    {
+        this.foodRepository = foodRepository;
+    }
     [HttpGet]
     public string GetAll()
     {

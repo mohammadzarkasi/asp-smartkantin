@@ -15,6 +15,8 @@ builder.Services.AddDbContext<DefaultMysqlDbContext>(options =>
 
 // me-register repository
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+builder.Services.AddScoped<IFoodRepository, FoodRepository>();
+builder.Services.AddScoped<IMyUserRepository, MyUserRepository>();
 
 
 
