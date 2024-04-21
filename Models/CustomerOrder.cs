@@ -1,0 +1,19 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace smartkantin.Models
+{
+    public class CustomerOrder
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id {get;set;}
+        public Guid UserId {get;set;}
+        public Guid PaymentMethodId {get;set;}
+        public double TotalPrice {get;set;}
+        public DateTime CreatedOn { get; set; }
+        public DateTime? UpdatedOn { get; set; }
+        public DateTime? PaymentExpiredAt { get; set; }
+        public DateTime? PaymentDoneAt { get; set; }
+    }
+}

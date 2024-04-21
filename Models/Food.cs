@@ -13,5 +13,5 @@ public class Food
     public string FoodPict { get; set; }
     public double Price { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }

@@ -8,7 +8,7 @@ public class MyUserDto
     public string Email { get; set; }
     public string Status { get; set; }
     public DateTime CreatedOn { get; set; }
-    public DateTime UpdatedOn { get; set; }
+    public DateTime? UpdatedOn { get; set; }
 
     public static MyUserDto FromMyUser(MyUser user)
     {
