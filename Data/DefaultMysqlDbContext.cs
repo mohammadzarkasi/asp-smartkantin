@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using smartkantin.Models;
 
 namespace smartkantin.Data;
 
-public class DefaultMysqlDbContext : DbContext
+public class DefaultMysqlDbContext : IdentityDbContext<AppUser>
 {
     public DefaultMysqlDbContext(DbContextOptions options) : base(options)
     {
@@ -17,6 +18,6 @@ public class DefaultMysqlDbContext : DbContext
     public DbSet<CustomerOrder> CustomerOrders {get;set;}
     public DbSet<CustomerOrderDetail> CustomerOrderDetails {get;set;}
     public DbSet<PaymentMethod> PaymentMethods {get;set;}
-    public DbSet<Role> Roles {get;set;}
-    public DbSet<UserRole> UserRoles {get;set;}
+    public DbSet<Role> MyRoles {get;set;}
+    public DbSet<UserRole> MyUserRoles {get;set;}
 }

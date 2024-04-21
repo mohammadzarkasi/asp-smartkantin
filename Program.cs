@@ -1,5 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using smartkantin.Data;
+using smartkantin.Models;
 using smartkantin.Repository;
 using smartkantin.Repository.Impl;
 
@@ -11,6 +15,46 @@ builder.Services.AddDbContext<DefaultMysqlDbContext>(options =>
     var connStr = builder.Configuration.GetConnectionString("mysql1") ?? "";
     Console.WriteLine("conn str: " + connStr);
     options.UseMySQL(connStr);
+});
+
+// config identity / jwt
+builder.Services.AddIdentity<AppUser, IdentityRole>(option => {
+    option.Password.RequireDigit = true;
+    option.Password.RequireUppercase = true;
+    option.Password.RequireLowercase = true;
+    option.Password.RequireNonAlphanumeric = true;
+    option.Password.RequiredLength = 5;
+})
+.AddEntityFrameworkStores<DefaultMysqlDbContext>();
+
+
+var JWTSigningKey_ = builder.Configuration["JWT:SigningKey"];
+if(JWTSigningKey_ == null)
+{
+    Console.WriteLine("jwt signing key is not found, using default...");
+}
+string JWTSigningKey = JWTSigningKey_ ?? "wkwkwkwk";
+
+builder.Services.AddAuthentication(option => {
+    option.DefaultAuthenticateScheme = 
+    option.DefaultChallengeScheme = 
+    option.DefaultForbidScheme = 
+    option.DefaultScheme =
+    option.DefaultSignInScheme = 
+    option.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(option => {
+    option.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            System.Text.Encoding.UTF8.GetBytes(JWTSigningKey)
+        )
+    };
 });
 
 // me-register repository
@@ -45,7 +89,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
