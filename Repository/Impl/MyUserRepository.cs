@@ -33,7 +33,6 @@ public class MyUserRepository : IMyUserRepository
             Email = form.Email,
             Password = form.Password,
             CreatedOn = DateTime.Now,
-            UpdatedOn = DateTime.Now,
             Status = "waiting-activation"
         };
 
