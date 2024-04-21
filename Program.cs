@@ -1,15 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using smartkantin.Data;
+using smartkantin.Repository;
+using smartkantin.Repository.Impl;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// me-register dbcontext
 builder.Services.AddDbContext<DefaultMysqlDbContext>(options =>
 {
     var connStr = builder.Configuration.GetConnectionString("mysql1") ?? "";
     Console.WriteLine("conn str: " + connStr);
     options.UseMySQL(connStr);
 });
+
+// me-register repository
+builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 
 
 
@@ -24,7 +29,7 @@ builder.Services.AddSwaggerGen(opt =>
 {
     opt.OrderActionsBy(args => args.RelativePath);
 });
-
+// swagger dapat dibuka di /swagger
 
 
 var app = builder.Build();
