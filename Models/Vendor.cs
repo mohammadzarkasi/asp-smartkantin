@@ -9,8 +9,8 @@ public class Vendor
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
-    public string Name { get; set; } = "";
-    public string PictPath { get; set; } = "";
+    public string Name { get; set; }
+    public string PictPath { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

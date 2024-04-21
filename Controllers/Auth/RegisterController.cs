@@ -16,21 +16,21 @@ public class RegisterController : ControllerBase
         this.userRepository = userRepository;
     }
     [HttpPost]
-    public async Task<MyUserDto> Register([FromBody] RegisterDto form)
+    public async Task<ActionResult<MyUserDto>> Register([FromBody] RegisterDto form)
     {
         var userByEmail = await userRepository.GetOneByEmail(form.Email);
         if (userByEmail != null)
         {
-            throw new Exception("Email sudah dipakai");
+            return StatusCode(StatusCodes.Status400BadRequest, "Email sudah dipakai");
         }
 
         var userByUsername = await userRepository.GetOneByUsername(form.Username);
         if (userByUsername != null)
         {
-            throw new Exception("Username sudah dipakai");
+            return StatusCode(StatusCodes.Status400BadRequest, "Username sudah dipakai");
         }
 
         var newUser = await userRepository.RegisterNewUser(form);
-        return MyUserDto.FromMyUser(newUser);
+        return Ok(MyUserDto.FromMyUser(newUser));
     }
 }

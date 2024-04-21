@@ -4,9 +4,9 @@ namespace smartkantin.Dto;
 public class MyUserDto
 {
     public Guid Id { get; set; }
-    public string Username { get; set; } = "";
-    public string Email { get; set; } = "";
-    public string Status { get; set; } = "";
+    public string Username { get; set; }
+    public string Email { get; set; }
+    public string Status { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime UpdatedOn { get; set; }
 

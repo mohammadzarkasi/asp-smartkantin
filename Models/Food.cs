@@ -9,8 +9,8 @@ public class Food
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
     public Guid VendorId { get; set; }
-    public string Name { get; set; } = "";
-    public string FoodPict { get; set; } = "";
+    public string Name { get; set; }
+    public string FoodPict { get; set; }
     public double Price { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
