@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using smartkantin.Dto;
 using smartkantin.Models;
 using smartkantin.Repository;
+using smartkantin.Service;
 
 namespace smartkantin.Controllers.Auth;
 
@@ -12,12 +13,14 @@ namespace smartkantin.Controllers.Auth;
 public class RegisterController : ControllerBase
 {
     private readonly UserManager<AppUser> userManager;
+    private readonly ITokenService tokenService;
 
     // private readonly IMyUserRepository userRepository;
 
-    public RegisterController(IMyUserRepository userRepository, UserManager<AppUser> userManager)
+    public RegisterController(IMyUserRepository userRepository, UserManager<AppUser> userManager, ITokenService tokenService)
     {
         this.userManager = userManager;
+        this.tokenService = tokenService;
         // this.userRepository = userRepository;
     }
 
@@ -26,11 +29,11 @@ public class RegisterController : ControllerBase
     {
         try
         {
-            if(ModelState.IsValid == false)
+            if (ModelState.IsValid == false)
             {
                 return BadRequest(ModelState);
             }
-            
+
             var appUser = new AppUser
             {
                 UserName = form.Username,
@@ -39,12 +42,15 @@ public class RegisterController : ControllerBase
 
             var createdUser = await userManager.CreateAsync(appUser, form.Password);
 
-            if(createdUser.Succeeded)
+            if (createdUser.Succeeded)
             {
                 var roleResult = await userManager.AddToRoleAsync(appUser, "User");
-                if(roleResult.Succeeded)
+                if (roleResult.Succeeded)
                 {
+                    var token = tokenService.CreateToken(appUser);
+                    // Console.WriteLine(token);
                     return Ok("User created");
+                    // return Ok(token);
                 }
                 else
                 {
@@ -61,6 +67,7 @@ public class RegisterController : ControllerBase
             return StatusCode(StatusCodes.Status400BadRequest, ex);
         }
     }
+
     // [HttpPost]
     // public async Task<ActionResult<MyUserDto>> Register([FromBody] RegisterDto form)
     // {

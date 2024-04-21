@@ -6,93 +6,115 @@ using smartkantin.Data;
 using smartkantin.Models;
 using smartkantin.Repository;
 using smartkantin.Repository.Impl;
+using smartkantin.Service;
+using smartkantin.Service.Impl;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// me-register dbcontext
-builder.Services.AddDbContext<DefaultMysqlDbContext>(options =>
+internal class Program
 {
-    var connStr = builder.Configuration.GetConnectionString("mysql1") ?? "";
-    Console.WriteLine("conn str: " + connStr);
-    options.UseMySQL(connStr);
-});
-
-// config identity / jwt
-builder.Services.AddIdentity<AppUser, IdentityRole>(option => {
-    option.Password.RequireDigit = true;
-    option.Password.RequireUppercase = true;
-    option.Password.RequireLowercase = true;
-    option.Password.RequireNonAlphanumeric = true;
-    option.Password.RequiredLength = 5;
-})
-.AddEntityFrameworkStores<DefaultMysqlDbContext>();
-
-
-var JWTSigningKey_ = builder.Configuration["JWT:SigningKey"];
-if(JWTSigningKey_ == null)
-{
-    Console.WriteLine("jwt signing key is not found, using default...");
-}
-string JWTSigningKey = JWTSigningKey_ ?? "wkwkwkwk";
-
-builder.Services.AddAuthentication(option => {
-    option.DefaultAuthenticateScheme = 
-    option.DefaultChallengeScheme = 
-    option.DefaultForbidScheme = 
-    option.DefaultScheme =
-    option.DefaultSignInScheme = 
-    option.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(option => {
-    option.TokenValidationParameters = new TokenValidationParameters
+    private static void Main(string[] args)
     {
-        ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["JWT:Issuer"],
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:Audience"],
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(
-            System.Text.Encoding.UTF8.GetBytes(JWTSigningKey)
-        )
-    };
-});
+        var builder = WebApplication.CreateBuilder(args);
 
-// me-register repository
-builder.Services.AddScoped<IVendorRepository, VendorRepository>();
-builder.Services.AddScoped<IFoodRepository, FoodRepository>();
-builder.Services.AddScoped<IMyUserRepository, MyUserRepository>();
+        // me-register dbcontext
+        builder.Services.AddDbContext<DefaultMysqlDbContext>(options =>
+        {
+            var connStr = builder.Configuration.GetConnectionString("mysql1") ?? "";
+            Console.WriteLine("conn str: " + connStr);
+            options.UseMySQL(connStr);
+        });
 
-
-
-// Add services to the container.
-
-
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(opt =>
-{
-    opt.OrderActionsBy(args => args.RelativePath);
-});
-// swagger dapat dibuka di /swagger
+        // config identity / jwt
+        builder.Services.AddIdentity<AppUser, IdentityRole>(option =>
+        {
+            option.Password.RequireDigit = true;
+            option.Password.RequireUppercase = true;
+            option.Password.RequireLowercase = true;
+            option.Password.RequireNonAlphanumeric = true;
+            option.Password.RequiredLength = 5;
+        })
+        .AddEntityFrameworkStores<DefaultMysqlDbContext>();
 
 
-var app = builder.Build();
+        // var JWTSigningKey_ = builder.Configuration["JWT:SigningKey"];
+        // if (JWTSigningKey_ == null)
+        // {
+        //     Console.WriteLine("jwt signing key is not found, using default...");
+        // }
+        // string JWTSigningKey = JWTSigningKey_ ?? "wkwkwkwk";
+        var JWTSigningKey = GetStringFromConfig(builder.Configuration, "JWT:SigningKey", "wkwkwkwk");
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+        builder.Services.AddAuthentication(option =>
+        {
+            option.DefaultAuthenticateScheme =
+            option.DefaultChallengeScheme =
+            option.DefaultForbidScheme =
+            option.DefaultScheme =
+            option.DefaultSignInScheme =
+            option.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(option =>
+        {
+            option.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = builder.Configuration["JWT:Issuer"],
+                ValidateAudience = true,
+                ValidAudience = builder.Configuration["JWT:Audience"],
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    System.Text.Encoding.UTF8.GetBytes(JWTSigningKey)
+                )
+            };
+        });
+
+        // me-register repository
+        builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+        builder.Services.AddScoped<IFoodRepository, FoodRepository>();
+        builder.Services.AddScoped<IMyUserRepository, MyUserRepository>();
+        builder.Services.AddScoped<ITokenService, TokenService>();
+
+
+        // Add services to the container.
+
+
+
+        builder.Services.AddControllers();
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(opt =>
+        {
+            opt.OrderActionsBy(args => args.RelativePath);
+        });
+        // swagger dapat dibuka di /swagger
+
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+
+        app.MapControllers();
+
+        app.Run();
+    }
+
+    private static string GetStringFromConfig(ConfigurationManager configuration, string key, string defaultValue)
+    {
+        var r = configuration[key];
+        if (r != null)
+        {
+            return r;
+        }
+        return defaultValue;
+    }
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-
-app.MapControllers();
-
-app.Run();
