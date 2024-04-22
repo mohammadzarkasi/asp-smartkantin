@@ -47,7 +47,7 @@ public class RegisterController : ControllerBase
                 var roleResult = await userManager.AddToRoleAsync(appUser, "User");
                 if (roleResult.Succeeded)
                 {
-                    var token = tokenService.CreateToken(appUser);
+                    // var token = tokenService.CreateToken(appUser);
                     // Console.WriteLine(token);
                     return Ok("User created");
                     // return Ok(token);

@@ -41,7 +41,7 @@ internal class Program
         //     Console.WriteLine("jwt signing key is not found, using default...");
         // }
         // string JWTSigningKey = JWTSigningKey_ ?? "wkwkwkwk";
-        var JWTSigningKey = GetStringFromConfig(builder.Configuration, "JWT:SigningKey", "wkwkwkwk");
+        var JWTSigningKey = GetStringFromConfig(builder.Configuration, "JWT:SigningKey", "tDMmCr8tst5niSO8qyeRZNI2MyHVsW");
 
         builder.Services.AddAuthentication(option =>
         {
