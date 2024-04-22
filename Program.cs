@@ -85,13 +85,15 @@ internal class Program
         builder.Services.AddSwaggerGen(opt =>
         {
             opt.OrderActionsBy(args => args.RelativePath);
-            
+
             // konfig agar swagger bisa menggunakan jwt
-            opt.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo{
+            opt.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            {
                 Title = "API Smart Kantin",
                 Version = "v1"
             });
-            opt.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme{
+            opt.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
                 In = Microsoft.OpenApi.Models.ParameterLocation.Header,
                 Description = "Please enter a valid token",
                 Name = "Authorization",
@@ -121,7 +123,11 @@ internal class Program
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(opt =>
+            {
+                // opt.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
+                opt.EnablePersistAuthorization();
+            });
         }
 
         app.UseHttpsRedirection();

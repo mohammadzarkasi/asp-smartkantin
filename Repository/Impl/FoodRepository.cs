@@ -30,6 +30,12 @@ public class FoodRepository : IFoodRepository
         return result;
     }
 
+    public async Task<IEnumerable<Food>> GetAllByVendor(Guid VendorId)
+    {
+        var result = await dbContext.Foods.Where(f => f.VendorId == VendorId).ToListAsync();
+        return result;
+    }
+
     public async Task<Food?> GetById(Guid id)
     {
         var result = await dbContext.Foods.FirstOrDefaultAsync((item) => item.Id == id);

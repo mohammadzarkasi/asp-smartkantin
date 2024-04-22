@@ -1,4 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using smartkantin.Dto;
+using smartkantin.Models;
+using smartkantin.Repository;
+using smartkantin.Tools;
 
 namespace smartkantin.Controllers.Vendor;
 
@@ -6,15 +11,64 @@ namespace smartkantin.Controllers.Vendor;
 [Route("/api/vendor/profile")]
 public class VendorProfileController : ControllerBase
 {
-    [HttpGet]
-    public string MyProfile()
+    private readonly UserManager<AppUser> userManager;
+    private readonly IVendorRepository vendorRepository;
+
+    public VendorProfileController(UserManager<AppUser> userManager, IVendorRepository vendorRepository)
     {
-        return "my profile";
+        this.userManager = userManager;
+        this.vendorRepository = vendorRepository;
+    }
+    [HttpGet]
+    public async Task<ActionResult<VendorAccount>> MyProfile()
+    {
+        var user = await SessionTools.GetCurrentUser(userManager, User);
+        if (user == null)
+        {
+            return BadRequest("user tidak ditemukan, " + user);
+        }
+        var vendorAccount = await vendorRepository.GetByUserId(user?.Id ?? "");
+        if (vendorAccount == null)
+        {
+            return NotFound("data vendor tidak ditemukan");
+        }
+        return Ok(vendorAccount);
     }
 
     [HttpPost]
-    public string Update()
+    public async Task<ActionResult<VendorAccount>> Update([FromBody] NewVendorDto form)
     {
-        return "update";
+        var user = await SessionTools.GetCurrentUser(userManager, User);
+        if (user == null)
+        {
+            return BadRequest("user tidak ditemukan, " + user);
+        }
+        var vendorAccount = await vendorRepository.GetByUserId(user?.Id ?? "");
+        if (vendorAccount == null)
+        {
+            var newProfile = new VendorAccount
+            {
+                Name = form.Name,
+                CreatedAt = DateTime.Now,
+                UserId = user?.Id ?? "",
+                PictPath = "",
+            };
+            var result = await vendorRepository.Add(newProfile);
+            if (result == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Gagal menyimpan data");
+            }
+            return Ok(result);
+        }
+        else
+        {
+            vendorAccount.Name = form.Name;
+            var result = await vendorRepository.Update(vendorAccount);
+            if (result == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Gagal menyimpan data");
+            }
+            return Ok(result);
+        }
     }
 }

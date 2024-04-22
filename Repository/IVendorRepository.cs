@@ -4,10 +4,11 @@ namespace smartkantin.Repository;
 
 public interface IVendorRepository
 {
-    Task<IEnumerable<Vendor>> GetAll();
-    Task<Vendor?> GetById(Guid id);
-    Task<Vendor> Add(Vendor item);
-    Task<Vendor> Update(Vendor item);
-    Task Delete(Vendor item);
+    Task<IEnumerable<VendorAccount>> GetAll();
+    Task<VendorAccount?> GetById(Guid id);
+    Task<VendorAccount?> GetByUserId(string UserId);
+    Task<VendorAccount> Add(VendorAccount item);
+    Task<VendorAccount> Update(VendorAccount item);
+    Task Delete(VendorAccount item);
     Task Save();
 }
