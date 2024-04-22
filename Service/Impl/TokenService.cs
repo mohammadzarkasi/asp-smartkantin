@@ -15,7 +15,7 @@ namespace smartkantin.Service.Impl
         public TokenService(IConfiguration config)
         {
             this.config = config;
-            var signingKey = GetString(config, "JWT:SigningKey", "wkwkwkwk");
+            var signingKey = GetString(config, "JWT:SigningKey", "wJMRQjj4wNQM1frktTy4zNnRufmtuuJevxJx6acJ8nLai6m1p0cHAzN0SJJM1tSheWWeqgMeTZzBy3aTwqjchpNWZz7Cru8kETRVUzGHwrqF3ePNzUbTJCyr1NGjqFP3899RnKeLjqyc");
             Issuer = GetString(config, "JWT:Issuer", "http://localhost");
             Audience = GetString(config, "JWT:Audience", "http://localhost");
             key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
