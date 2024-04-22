@@ -71,7 +71,7 @@ internal class Program
         // me-register repository
         builder.Services.AddScoped<IVendorRepository, VendorRepository>();
         builder.Services.AddScoped<IFoodRepository, FoodRepository>();
-        builder.Services.AddScoped<IMyUserRepository, MyUserRepository>();
+        // builder.Services.AddScoped<IMyUserRepository, MyUserRepository>();
         builder.Services.AddScoped<ITokenService, TokenService>();
 
 

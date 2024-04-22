@@ -17,7 +17,7 @@ public class RegisterController : ControllerBase
 
     // private readonly IMyUserRepository userRepository;
 
-    public RegisterController(IMyUserRepository userRepository, UserManager<AppUser> userManager, ITokenService tokenService)
+    public RegisterController(UserManager<AppUser> userManager, ITokenService tokenService)
     {
         this.userManager = userManager;
         this.tokenService = tokenService;
