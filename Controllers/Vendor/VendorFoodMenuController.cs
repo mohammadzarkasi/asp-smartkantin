@@ -28,6 +28,10 @@ public class VendorFoodMenuController : ControllerBase
     public async Task<ActionResult<List<Food>>> GetAll()
     {
         var user = await SessionTools.GetCurrentUser(userManager, User);
+        if (user == null)
+        {
+            return BadRequest("user tidak ditemukan, " + user);
+        }
         var vendorMe = await vendorRepository.GetByUserId(user?.Id ?? "");
         var result = await foodRepository.GetAllByVendor(vendorMe?.Id ?? Guid.Empty);
         // return Ok("get all");
@@ -38,6 +42,10 @@ public class VendorFoodMenuController : ControllerBase
     public async Task<ActionResult<Food>> Add([FromBody] NewFoodDto form)
     {
         var user = await SessionTools.GetCurrentUser(userManager, User);
+        if (user == null)
+        {
+            return BadRequest("user tidak ditemukan, " + user);
+        }
         var vendorMe = await vendorRepository.GetByUserId(user?.Id ?? "");
         if (vendorMe == null)
         {
@@ -49,7 +57,8 @@ public class VendorFoodMenuController : ControllerBase
             CreatedAt = DateTime.Now,
             Name = form.Name,
             Price = form.Price,
-            VendorId = vendorMe.Id
+            VendorId = vendorMe.Id,
+            FoodPict = "",
         };
 
         var result = await foodRepository.Add(newFood);
