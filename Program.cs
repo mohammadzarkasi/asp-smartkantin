@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using smartkantin.Data;
 using smartkantin.Models;
 using smartkantin.Repository;
@@ -84,6 +85,32 @@ internal class Program
         builder.Services.AddSwaggerGen(opt =>
         {
             opt.OrderActionsBy(args => args.RelativePath);
+            
+            // konfig agar swagger bisa menggunakan jwt
+            opt.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo{
+                Title = "API Smart Kantin",
+                Version = "v1"
+            });
+            opt.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme{
+                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                Description = "Please enter a valid token",
+                Name = "Authorization",
+                Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "Bearer"
+            });
+            opt.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement{
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference{
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[]{}
+                }
+            });
         });
         // swagger dapat dibuka di /swagger
 
