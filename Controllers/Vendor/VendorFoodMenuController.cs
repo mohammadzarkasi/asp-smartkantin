@@ -66,9 +66,42 @@ public class VendorFoodMenuController : ControllerBase
         return Ok(result);
     }
 
+
     [HttpPost("update")]
-    public string Update()
+    public async Task<ActionResult<Food>> Update([FromBody] NewFoodDto form, [FromQuery(Name = "id")] Guid id)
     {
-        return "update";
+        var food = await foodRepository.GetById(id);
+        if(food == null)
+        {
+            return NotFound("data tidak ditemukan");
+        }
+
+        var user = await SessionTools.GetCurrentUser(userManager, User);
+        if(user == null)
+        {
+            return BadRequest("session tidak valid");
+        }
+        
+        var vendorMe = await vendorRepository.GetByUserId(user.Id);
+        if(vendorMe == null)
+        {
+            return BadRequest("data vendor tidak valid");
+        }
+        
+        if(food.VendorId != vendorMe.Id)
+        {
+            return Unauthorized("vendor tidak valid");
+        }
+
+        food.Name = form.Name;
+        food.Price = form.Price;
+
+        var result = await foodRepository.Update(food);
+        
+        if(result == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "gagal update");
+        }
+        return Ok(result);
     }
 }
