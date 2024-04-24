@@ -7,10 +7,11 @@ namespace smartkantin.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id {get;set;}
-        public Guid UserId {get;set;}
-        public Guid PaymentMethodId {get;set;}
-        public double TotalPrice {get;set;}
+        public Guid Id { get; set; }
+        public Guid CustomerId { get; set; }
+        public Guid VendorId { get; set; }
+        public Guid PaymentMethodId { get; set; }
+        public double TotalPrice { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public DateTime? PaymentExpiredAt { get; set; }
