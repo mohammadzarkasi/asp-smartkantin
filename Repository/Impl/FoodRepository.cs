@@ -18,27 +18,37 @@ public class FoodRepository : IFoodRepository
         return item;
     }
 
-    public async Task Delete(Food item)
+    public async Task FlagDelete(Food item)
     {
-        dbContext.Remove(item);
+        // dbContext.Remove(item);
+        item.DeletedAt = DateTime.Now;
+
+        dbContext.Update(item);
+
         await Save();
     }
 
     public async Task<IEnumerable<Food>> GetAll()
     {
-        var result = await dbContext.Foods.ToListAsync();
+        var result = await dbContext.Foods.Where(f => f.DeletedAt == null).ToListAsync();
         return result;
     }
 
     public async Task<IEnumerable<Food>> GetAllByVendor(Guid VendorId)
     {
-        var result = await dbContext.Foods.Where(f => f.VendorId == VendorId).ToListAsync();
+        var result = await dbContext.Foods.Where(f => f.VendorId == VendorId && f.DeletedAt == null).ToListAsync();
         return result;
     }
 
     public async Task<Food?> GetById(Guid id)
     {
-        var result = await dbContext.Foods.FirstOrDefaultAsync((item) => item.Id == id);
+        var result = await dbContext.Foods.FirstOrDefaultAsync((item) => item.Id == id && item.DeletedAt == null);
+        return result;
+    }
+
+    public async Task<Food?> GetByIdAndVendorId(Guid id, Guid VendorId)
+    {
+        var result = await dbContext.Foods.FirstOrDefaultAsync((item) => item.Id == id && item.DeletedAt == null && item.VendorId == VendorId);
         return result;
     }
 
