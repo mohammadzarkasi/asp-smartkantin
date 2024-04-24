@@ -7,9 +7,13 @@ namespace smartkantin.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id {get;set;}
-        public Guid UserId {get;set;}
-        public Guid FoodId {get;set;}
+        public Guid Id { get; set; }
+
+        [Column(TypeName = "VARCHAR")]
+        [StringLength(255)]
+        public string UserId { get; set; }
+        public Guid FoodId { get; set; }
+        public int Qty { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
     }
