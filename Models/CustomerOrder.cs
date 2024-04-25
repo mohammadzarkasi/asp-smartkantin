@@ -13,11 +13,15 @@ namespace smartkantin.Models
         [StringLength(255)]
         public string CustomerId { get; set; }
         // public Guid VendorId { get; set; }
-        public Guid PaymentMethodId { get; set; }
+        public Guid? PaymentMethodId { get; set; }
         public double TotalPrice { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public DateTime? PaymentExpiredAt { get; set; }
         public DateTime? PaymentDoneAt { get; set; }
+
+        // navigation property
+        [InverseProperty("Order")]
+        public ICollection<CustomerOrderPerVendor> orderPerVendors {get;set;} 
     }
 }

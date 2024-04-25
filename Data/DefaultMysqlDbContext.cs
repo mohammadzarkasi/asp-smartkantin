@@ -17,6 +17,7 @@ public class DefaultMysqlDbContext : IdentityDbContext<AppUser>
     // public DbSet<MyUser> MyUsers { get; set; }
     public DbSet<CustomerCartItem> CustomerCartItems { get; set; }
     public DbSet<CustomerOrder> CustomerOrders { get; set; }
+    public DbSet<CustomerOrderPerVendor> CustomerOrderPerVendors {get;set;}
     public DbSet<CustomerOrderDetail> CustomerOrderDetails { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     // public DbSet<Role> MyRoles {get;set;}

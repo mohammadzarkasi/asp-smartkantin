@@ -82,9 +82,11 @@ internal class Program
 
         // Add services to the container.
 
-
-
-        builder.Services.AddControllers();
+        // builder.Services.AddControllers();
+        builder.Services.AddControllers().AddNewtonsoftJson(opt => {
+            // config agar serialisasi json mengabaikan adanya reference cycle
+            opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        });
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(opt =>
@@ -120,6 +122,10 @@ internal class Program
             });
         });
         // swagger dapat dibuka di /swagger
+
+
+        // json serializer
+        
 
 
         var app = builder.Build();

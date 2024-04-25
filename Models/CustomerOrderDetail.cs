@@ -20,5 +20,9 @@ namespace smartkantin.Models
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
 
+
+        // navigation property
+        [ForeignKey("OrderPerVendorId")]
+        public CustomerOrderPerVendor orderPerVendor {get;set;}
     }
 }

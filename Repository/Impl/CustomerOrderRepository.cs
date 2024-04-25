@@ -17,6 +17,14 @@ namespace smartkantin.Repository.Impl
             throw new NotImplementedException();
         }
 
+        public async Task<CustomerOrder> Add(CustomerOrder order)
+        {
+            await dbContext.AddAsync(order);
+            await dbContext.SaveChangesAsync();
+
+            return order;
+        }
+
         public Task Delete(CustomerOrder order)
         {
             throw new NotImplementedException();
@@ -30,6 +38,14 @@ namespace smartkantin.Repository.Impl
         public async Task<IEnumerable<CustomerOrder>> GetAllByCustomer(AppUser user)
         {
             var result = await dbContext.CustomerOrders.Where(item => item.CustomerId == user.Id).ToListAsync();
+            return result;
+        }
+
+        public async Task<CustomerOrder?> GetOneByIdAndCustomer(AppUser user, Guid Id)
+        {
+            var result = await dbContext.CustomerOrders
+                .Where(item => item.Id == Id && item.CustomerId == user.Id)
+                .FirstOrDefaultAsync();
             return result;
         }
 
