@@ -8,7 +8,8 @@ namespace smartkantin.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id {get;set;}
-        public Guid OrderId {get;set;}
+        // public Guid OrderId {get;set;}
+        public Guid OrderPerVendorId {get;set;}
         public Guid FoodId {get;set;}
         public int Qty {get;set;}
         public double PriceSnapshot {get;set;}

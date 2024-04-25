@@ -8,8 +8,11 @@ namespace smartkantin.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
-        public Guid CustomerId { get; set; }
-        public Guid VendorId { get; set; }
+        
+        [Column(TypeName = "VARCHAR")]
+        [StringLength(255)]
+        public string CustomerId { get; set; }
+        // public Guid VendorId { get; set; }
         public Guid PaymentMethodId { get; set; }
         public double TotalPrice { get; set; }
         public DateTime CreatedOn { get; set; }

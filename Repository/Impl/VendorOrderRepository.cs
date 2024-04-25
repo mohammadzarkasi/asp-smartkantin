@@ -28,10 +28,11 @@ namespace smartkantin.Repository.Impl
             return result;
         }
 
-        public async Task<IEnumerable<CustomerOrder>> GetAllByVendor(VendorAccount vendor)
+        public Task<IEnumerable<CustomerOrder>> GetAllByVendor(VendorAccount vendor)
         {
-            var result = await dbContext.CustomerOrders.Where(item => item.VendorId == vendor.Id).ToListAsync();
-            return result;
+            throw new NotImplementedException();
+            // var result = await dbContext.CustomerOrders.Where(item => item.VendorId == vendor.Id).ToListAsync();
+            // return result;
         }
 
         public Task<CustomerOrder?> GetById(Guid id)

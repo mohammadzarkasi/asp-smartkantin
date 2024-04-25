@@ -34,7 +34,11 @@ namespace smartkantin.Repository.Impl
 
         public async Task<IEnumerable<CustomerCartItem>> GetAllByUser(AppUser user)
         {
-            var result = await dbContext.CustomerCartItems.Where(item => item.UserId == user.Id).ToListAsync();
+            var result = await dbContext.CustomerCartItems
+                .Include(c => c.TheFood)
+                    .ThenInclude(f => f.Vendor)
+                .Where(item => item.UserId == user.Id)
+                .ToListAsync();
             return result;
         }
 

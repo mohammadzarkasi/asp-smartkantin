@@ -73,6 +73,7 @@ internal class Program
         builder.Services.AddScoped<IFoodRepository, FoodRepository>();
         builder.Services.AddScoped<IVendorOrderRepository, VendorOrderRepository>();
         builder.Services.AddScoped<ICustomerCartRepository, CustomerCartRepository>();
+        builder.Services.AddScoped<ICustomerOrderRepository, CustomerOrderRepository>();
 
 
 

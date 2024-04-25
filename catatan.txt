@@ -1,0 +1,2 @@
+# mencegah dotnet me-refresh saat ada perubahan kode
+set DOTNET_WATCH_SUPPRESS_BROWSER_REFRESH=1

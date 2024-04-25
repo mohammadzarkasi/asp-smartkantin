@@ -12,9 +12,13 @@ namespace smartkantin.Models
         [Column(TypeName = "VARCHAR")]
         [StringLength(255)]
         public string UserId { get; set; }
+        
+        [ForeignKey("TheFood")]
         public Guid FoodId { get; set; }
         public int Qty { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
+
+        public Food TheFood {get;set;}
     }
 }

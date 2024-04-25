@@ -8,6 +8,8 @@ public class Food
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
+    
+    [ForeignKey("Vendor")]
     public Guid VendorId { get; set; }
     public string Name { get; set; }
     public string FoodPict { get; set; }
@@ -15,4 +17,8 @@ public class Food
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public DateTime? DeletedAt { get; set; }
+
+
+    // navigation property
+    public VendorAccount Vendor {get;set;}
 }
