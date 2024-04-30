@@ -21,7 +21,7 @@ public class FoodRepository : IFoodRepository
     public async Task FlagDelete(Food item)
     {
         // dbContext.Remove(item);
-        item.DeletedAt = DateTime.Now;
+        item.DeletedOn = DateTime.Now;
 
         dbContext.Update(item);
 
@@ -30,25 +30,25 @@ public class FoodRepository : IFoodRepository
 
     public async Task<IEnumerable<Food>> GetAll()
     {
-        var result = await dbContext.Foods.Where(f => f.DeletedAt == null).ToListAsync();
+        var result = await dbContext.Foods.Where(f => f.DeletedOn == null).ToListAsync();
         return result;
     }
 
     public async Task<IEnumerable<Food>> GetAllByVendor(Guid VendorId)
     {
-        var result = await dbContext.Foods.Where(f => f.VendorId == VendorId && f.DeletedAt == null).ToListAsync();
+        var result = await dbContext.Foods.Where(f => f.VendorId == VendorId && f.DeletedOn == null).ToListAsync();
         return result;
     }
 
     public async Task<Food?> GetById(Guid id)
     {
-        var result = await dbContext.Foods.FirstOrDefaultAsync((item) => item.Id == id && item.DeletedAt == null);
+        var result = await dbContext.Foods.FirstOrDefaultAsync((item) => item.Id == id && item.DeletedOn == null);
         return result;
     }
 
     public async Task<Food?> GetByIdAndVendorId(Guid id, Guid VendorId)
     {
-        var result = await dbContext.Foods.FirstOrDefaultAsync((item) => item.Id == id && item.DeletedAt == null && item.VendorId == VendorId);
+        var result = await dbContext.Foods.FirstOrDefaultAsync((item) => item.Id == id && item.DeletedOn == null && item.VendorId == VendorId);
         return result;
     }
 

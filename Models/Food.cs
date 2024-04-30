@@ -8,17 +8,16 @@ public class Food
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
-    
-    [ForeignKey("Vendor")]
     public Guid VendorId { get; set; }
     public string Name { get; set; }
-    public string FoodPict { get; set; }
+    public string? FoodPict { get; set; }
     public double Price { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
-    public DateTime? DeletedAt { get; set; }
+    public DateTime CreatedOn { get; set; }
+    public DateTime? UpdatedOn { get; set; }
+    public DateTime? DeletedOn { get; set; }
 
 
     // navigation property
-    public VendorAccount Vendor {get;set;}
+    [ForeignKey("VendorId")]
+    public VendorAccount Vendor { get; set; }
 }

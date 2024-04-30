@@ -4,6 +4,6 @@ namespace smartkantin.Service
 {
     public interface ITokenService
     {
-        string CreateToken(AppUser user);
+        string CreateToken(MyUser user);
     }
 }

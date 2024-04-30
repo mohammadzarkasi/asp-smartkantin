@@ -25,15 +25,15 @@ internal class Program
         });
 
         // config identity / jwt
-        builder.Services.AddIdentity<AppUser, IdentityRole>(option =>
-        {
-            option.Password.RequireDigit = true;
-            option.Password.RequireUppercase = true;
-            option.Password.RequireLowercase = true;
-            option.Password.RequireNonAlphanumeric = true;
-            option.Password.RequiredLength = 5;
-        })
-        .AddEntityFrameworkStores<DefaultMysqlDbContext>();
+        // builder.Services.AddIdentity<AppUser, IdentityRole>(option =>
+        // {
+        //     // option.Password.RequireDigit = true;
+        //     // option.Password.RequireUppercase = true;
+        //     // option.Password.RequireLowercase = true;
+        //     // option.Password.RequireNonAlphanumeric = true;
+        //     option.Password.RequiredLength = 5;
+        // })
+        // .AddEntityFrameworkStores<DefaultMysqlDbContext>();
 
 
         // var JWTSigningKey_ = builder.Configuration["JWT:SigningKey"];
@@ -42,31 +42,31 @@ internal class Program
         //     Console.WriteLine("jwt signing key is not found, using default...");
         // }
         // string JWTSigningKey = JWTSigningKey_ ?? "wkwkwkwk";
-        var JWTSigningKey = GetStringFromConfig(builder.Configuration, "JWT:SigningKey", "wJMRQjj4wNQM1frktTy4zNnRufmtuuJevxJx6acJ8nLai6m1p0cHAzN0SJJM1tSheWWeqgMeTZzBy3aTwqjchpNWZz7Cru8kETRVUzGHwrqF3ePNzUbTJCyr1NGjqFP3899RnKeLjqyc");
+        // var JWTSigningKey = GetStringFromConfig(builder.Configuration, "JWT:SigningKey", "wJMRQjj4wNQM1frktTy4zNnRufmtuuJevxJx6acJ8nLai6m1p0cHAzN0SJJM1tSheWWeqgMeTZzBy3aTwqjchpNWZz7Cru8kETRVUzGHwrqF3ePNzUbTJCyr1NGjqFP3899RnKeLjqyc");
 
-        builder.Services.AddAuthentication(option =>
-        {
-            option.DefaultAuthenticateScheme =
-            option.DefaultChallengeScheme =
-            option.DefaultForbidScheme =
-            option.DefaultScheme =
-            option.DefaultSignInScheme =
-            option.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(option =>
-        {
-            option.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidIssuer = builder.Configuration["JWT:Issuer"],
-                ValidateAudience = true,
-                ValidAudience = builder.Configuration["JWT:Audience"],
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    System.Text.Encoding.UTF8.GetBytes(JWTSigningKey)
-                )
-            };
-        });
+        // builder.Services.AddAuthentication(option =>
+        // {
+        //     option.DefaultAuthenticateScheme =
+        //     option.DefaultChallengeScheme =
+        //     option.DefaultForbidScheme =
+        //     option.DefaultScheme =
+        //     option.DefaultSignInScheme =
+        //     option.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+        // })
+        // .AddJwtBearer(option =>
+        // {
+        //     option.TokenValidationParameters = new TokenValidationParameters
+        //     {
+        //         // ValidateIssuer = true,
+        //         // ValidIssuer = builder.Configuration["JWT:Issuer"],
+        //         // ValidateAudience = true,
+        //         // ValidAudience = builder.Configuration["JWT:Audience"],
+        //         ValidateIssuerSigningKey = true,
+        //         IssuerSigningKey = new SymmetricSecurityKey(
+        //             System.Text.Encoding.UTF8.GetBytes(JWTSigningKey)
+        //         )
+        //     };
+        // });
 
         // me-register repository
         builder.Services.AddScoped<IVendorRepository, VendorRepository>();
@@ -74,6 +74,7 @@ internal class Program
         builder.Services.AddScoped<IVendorOrderRepository, VendorOrderRepository>();
         builder.Services.AddScoped<ICustomerCartRepository, CustomerCartRepository>();
         builder.Services.AddScoped<ICustomerOrderRepository, CustomerOrderRepository>();
+        builder.Services.AddScoped<IMyUserRepository, MyUserRepository>();
 
 
 
@@ -83,7 +84,8 @@ internal class Program
         // Add services to the container.
 
         // builder.Services.AddControllers();
-        builder.Services.AddControllers().AddNewtonsoftJson(opt => {
+        builder.Services.AddControllers().AddNewtonsoftJson(opt =>
+        {
             // config agar serialisasi json mengabaikan adanya reference cycle
             opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
         });
@@ -125,7 +127,7 @@ internal class Program
 
 
         // json serializer
-        
+
 
 
         var app = builder.Build();

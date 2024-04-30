@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace smartkantin.Models;
+
+[Table("app_user")]
 public class MyUser
 {
     [Key]

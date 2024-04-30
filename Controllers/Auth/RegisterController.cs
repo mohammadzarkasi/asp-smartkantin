@@ -12,60 +12,79 @@ namespace smartkantin.Controllers.Auth;
 [Route("/api/auth/register")]
 public class RegisterController : ControllerBase
 {
-    private readonly UserManager<AppUser> userManager;
+    // private readonly UserManager<AppUser> userManager;
     private readonly ITokenService tokenService;
+    private readonly IMyUserRepository userRepository;
 
     // private readonly IMyUserRepository userRepository;
 
-    public RegisterController(UserManager<AppUser> userManager, ITokenService tokenService)
+    public RegisterController(ITokenService tokenService, IMyUserRepository userRepository)
     {
-        this.userManager = userManager;
+        // this.userManager = userManager;
         this.tokenService = tokenService;
+        this.userRepository = userRepository;
         // this.userRepository = userRepository;
     }
 
     [HttpPost]
     public async Task<IActionResult> Register([FromBody] RegisterDto form)
     {
-        try
+
+        // throw new NotImplementedException();
+        // try
+        // {
+        if (ModelState.IsValid == false)
         {
-            if (ModelState.IsValid == false)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var appUser = new AppUser
-            {
-                UserName = form.Username,
-                Email = form.Email
-            };
-
-            var createdUser = await userManager.CreateAsync(appUser, form.Password);
-
-            if (createdUser.Succeeded)
-            {
-                var roleResult = await userManager.AddToRoleAsync(appUser, "User");
-                if (roleResult.Succeeded)
-                {
-                    // var token = tokenService.CreateToken(appUser);
-                    // Console.WriteLine(token);
-                    return Ok("User created");
-                    // return Ok(token);
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, roleResult.Errors);
-                }
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, createdUser.Errors);
-            }
+            return BadRequest(ModelState);
         }
-        catch (Exception ex)
+
+        var existingUser = await userRepository.GetOneByEmail(form.Email) ?? await userRepository.GetOneByUsername(form.Username);
+
+        if (existingUser != null)
         {
-            return StatusCode(StatusCodes.Status400BadRequest, ex);
+            return BadRequest("email/username sudah dipakai");
         }
+
+        var result = await userRepository.RegisterNewUser(form);
+
+        if (result == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "terjadi kesalahan memproses data");
+        }
+        return Ok(MyUserDto.FromMyUser(result));
+
+        //     var appUser = new MyUser
+        //     {
+        //         Username = form.Username,
+        //         Email = form.Email
+        //     };
+
+        // var createdUser = await userManager.CreateAsync(appUser, form.Password);
+
+        //     if (createdUser.Succeeded)
+        //     {
+        //         var roleResult = await userManager.AddToRoleAsync(appUser, "User");
+        //         if (roleResult.Succeeded)
+        //         {
+        //             // var token = tokenService.CreateToken(appUser);
+        //             // Console.WriteLine(token);
+        //             return Ok("User created");
+        //             // return Ok(token);
+        //         }
+        //         else
+        //         {
+        //             return StatusCode(StatusCodes.Status500InternalServerError, roleResult.Errors);
+        //         }
+        //     }
+        //     else
+        //     {
+        //         return StatusCode(StatusCodes.Status400BadRequest, createdUser.Errors);
+        //     }
+        // }
+        // catch (Exception ex)
+        // {
+        //     return StatusCode(StatusCodes.Status400BadRequest, ex);
+        // }
     }
 
     // [HttpPost]

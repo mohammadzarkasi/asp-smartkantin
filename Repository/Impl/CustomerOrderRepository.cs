@@ -35,13 +35,13 @@ namespace smartkantin.Repository.Impl
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<CustomerOrder>> GetAllByCustomer(AppUser user)
+        public async Task<IEnumerable<CustomerOrder>> GetAllByCustomer(MyUser user)
         {
             var result = await dbContext.CustomerOrders.Where(item => item.CustomerId == user.Id).ToListAsync();
             return result;
         }
 
-        public async Task<CustomerOrder?> GetOneByIdAndCustomer(AppUser user, Guid Id)
+        public async Task<CustomerOrder?> GetOneByIdAndCustomer(MyUser user, Guid Id)
         {
             var result = await dbContext.CustomerOrders
                 .Where(item => item.Id == Id && item.CustomerId == user.Id)

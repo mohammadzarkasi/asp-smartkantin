@@ -41,9 +41,9 @@ public class VendorRepository : IVendorRepository
         return result;
     }
 
-    public async Task<VendorAccount?> GetByUserId(string UserId)
+    public async Task<VendorAccount?> GetByUser(MyUser user)
     {
-        var result = await dbContext.Vendors.Where(v => v.UserId == UserId).FirstOrDefaultAsync();
+        var result = await dbContext.Vendors.Where(v => v.UserId == user.Id).FirstOrDefaultAsync();
         return result;
     }
 

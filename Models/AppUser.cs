@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Identity;
+// using Microsoft.AspNetCore.Identity;
 
-namespace smartkantin.Models
-{
-    public class AppUser : IdentityUser
-    {
-        public string AccountStatus { get; set; } = "waiting-activation";
-    }
-}
+// namespace smartkantin.Models
+// {
+//     public class AppUser : IdentityUser
+//     {
+//         public string AccountStatus { get; set; } = "waiting-activation";
+//     }
+// }

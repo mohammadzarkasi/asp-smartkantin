@@ -11,13 +11,13 @@ namespace smartkantin.Service.Impl
     {
         private readonly IConfiguration config;
         private readonly SymmetricSecurityKey key;
-        private readonly string Issuer, Audience;
+        // private readonly string Issuer, Audience;
         public TokenService(IConfiguration config)
         {
             this.config = config;
             var signingKey = GetString(config, "JWT:SigningKey", "wJMRQjj4wNQM1frktTy4zNnRufmtuuJevxJx6acJ8nLai6m1p0cHAzN0SJJM1tSheWWeqgMeTZzBy3aTwqjchpNWZz7Cru8kETRVUzGHwrqF3ePNzUbTJCyr1NGjqFP3899RnKeLjqyc");
-            Issuer = GetString(config, "JWT:Issuer", "http://localhost");
-            Audience = GetString(config, "JWT:Audience", "http://localhost");
+            // Issuer = GetString(config, "JWT:Issuer", "http://localhost");
+            // Audience = GetString(config, "JWT:Audience", "http://localhost");
             key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
         }
 
@@ -31,14 +31,14 @@ namespace smartkantin.Service.Impl
             return defaultValue;
         }
 
-        public string CreateToken(AppUser user)
+        public string CreateToken(MyUser user)
         {
             Console.WriteLine("create claims");
             var claims = new List<Claim>
             {
-                new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email, user.Email ?? ""),
-                new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.GivenName, user.UserName ?? ""),
-                new Claim("user_id", user.Id),
+                new(ClaimTypes.Email, user.Email ?? ""),
+                new(ClaimTypes.Name, user.Username ?? ""),
+                new(ClaimTypes.GivenName, user.Id.ToString()),
             };
 
             Console.WriteLine("create creds");
@@ -50,8 +50,8 @@ namespace smartkantin.Service.Impl
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(7),
                 SigningCredentials = creds,
-                Issuer = Issuer,
-                Audience = Audience,
+                // Issuer = Issuer,
+                // Audience = Audience,
             };
 
             Console.WriteLine("create token handler");

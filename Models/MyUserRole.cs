@@ -3,26 +3,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace smartkantin.Models
 {
-    public class CustomerCartItem
+    [Table("app_user_x_role")]
+    public class MyUserRole
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
-
-        // [Column(TypeName = "VARCHAR")]
-        // [StringLength(255)]
+        public Guid RoleId { get; set; }
         public Guid UserId { get; set; }
-
-        // [ForeignKey("TheFood")]
-        public Guid FoodId { get; set; }
-        public int Qty { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? UpdatedOn { get; set; }
 
 
         // navigation property
-        [ForeignKey("FoodId")]
-        public Food TheFood { get; set; }
+
+        [ForeignKey("RoleId")]
+        public MyRole Role { get; set; }
+
 
         [ForeignKey("UserId")]
         public MyUser User { get; set; }

@@ -32,7 +32,7 @@ namespace smartkantin.Repository.Impl
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<CustomerCartItem>> GetAllByUser(AppUser user)
+        public async Task<IEnumerable<CustomerCartItem>> GetAllByUser(MyUser user)
         {
             var result = await dbContext.CustomerCartItems
                 .Include(c => c.TheFood)
@@ -42,13 +42,13 @@ namespace smartkantin.Repository.Impl
             return result;
         }
 
-        public async Task<CustomerCartItem?> GetOneByUserAndFoodId(AppUser user, Guid foodId)
+        public async Task<CustomerCartItem?> GetOneByUserAndFoodId(MyUser user, Guid foodId)
         {
             var result = await dbContext.CustomerCartItems.Where(item => item.UserId == user.Id && item.FoodId == foodId).FirstOrDefaultAsync();
             return result;
         }
 
-        public async Task<CustomerCartItem?> GetOneByUserAndId(AppUser user, Guid id)
+        public async Task<CustomerCartItem?> GetOneByUserAndId(MyUser user, Guid id)
         {
             var result = await dbContext.CustomerCartItems.Where(item => item.UserId == user.Id && item.Id == id).FirstOrDefaultAsync();
             return result;

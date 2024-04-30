@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using smartkantin.Dto;
 using smartkantin.Models;
+using smartkantin.Repository;
 using smartkantin.Service;
 
 namespace smartkantin.Controllers.Auth;
@@ -11,39 +12,59 @@ namespace smartkantin.Controllers.Auth;
 [Route("/api/auth/login")]
 public class LoginController : ControllerBase
 {
-    private readonly UserManager<AppUser> userManager;
+    // private readonly UserManager<AppUser> userManager;
     private readonly ITokenService tokenService;
-    private readonly SignInManager<AppUser> signInManager;
+    private readonly IMyUserRepository userRepository;
 
-    public LoginController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager)
+    // private readonly SignInManager<AppUser> signInManager;
+
+    // public LoginController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager)
+    public LoginController(ITokenService tokenService, IMyUserRepository userRepository)
     {
-        this.userManager = userManager;
+        // this.userManager = userManager;
         this.tokenService = tokenService;
-        this.signInManager = signInManager;
+        this.userRepository = userRepository;
+        // this.signInManager = signInManager;
     }
 
     [HttpPost]
     public async Task<IActionResult> Login([FromBody] LoginDto form)
     {
-        if(ModelState.IsValid == false)
+        if (ModelState.IsValid == false)
         {
             return BadRequest(ModelState);
-        }    
-        var user = await userManager.Users
-            .Where(item => item.UserName == form.UserName)
-            .FirstOrDefaultAsync();
-        
+        }
+
+        // return NotFound();
+        // var user = await userManager.Users
+        //     .Where(item => item.UserName == form.UserName)
+        //     .FirstOrDefaultAsync();
+        var user = await userRepository.GetOneByEmailOrUsername(form.Username);
+
         if (user == null)
         {
-            return Unauthorized("Invalid Username");
+            Console.WriteLine("user tidak ditemukan");
+            return Unauthorized("Username/Password tidak cocok");
         }
 
-        var loginResult = await signInManager.CheckPasswordSignInAsync(user, form.Password, false);
-
-        if(loginResult.Succeeded == false)
+        var isPasswordMatched = BCrypt.Net.BCrypt.EnhancedVerify(form.Password, user.Password);
+        if (isPasswordMatched == false)
         {
-            return Unauthorized("Username/Password Incorrect");
+            Console.WriteLine("password tidak cocok, hashed: " + user.Password);
+
+            // Console.WriteLine("new key: " + BCrypt.Net.BCrypt.EnhancedHashPassword("123", 13));
+            // Console.WriteLine("new key: " + BCrypt.Net.BCrypt.EnhancedHashPassword("123", 13));
+            // Console.WriteLine("new key: " + BCrypt.Net.BCrypt.EnhancedHashPassword("123", 13));
+
+            return Unauthorized("Username/Password tidak cocok");
         }
+
+        // var loginResult = await signInManager.CheckPasswordSignInAsync(user, form.Password, false);
+
+        // if (loginResult.Succeeded == false)
+        // {
+        //     return Unauthorized("Username/Password Incorrect");
+        // }
 
         var token = tokenService.CreateToken(user);
 
