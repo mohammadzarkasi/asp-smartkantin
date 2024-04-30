@@ -6,7 +6,7 @@ namespace smartkantin.Repository
     {
         Task<CustomerOrder?> GetById(Guid id);
         Task<IEnumerable<CustomerOrder>> GetAll();
-        Task<IEnumerable<CustomerOrder>> GetAllByVendor(VendorAccount vendor);
+        Task<IEnumerable<CustomerOrderPerVendor>> GetAllByVendor(VendorAccount vendor);
         Task<CustomerOrder?> Decline(CustomerOrder order);
         Task<CustomerOrder?> Accept(CustomerOrder order);
         Task<CustomerOrder?> NotifyOrderDone(CustomerOrder order);
