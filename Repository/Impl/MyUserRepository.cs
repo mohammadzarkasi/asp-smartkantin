@@ -29,6 +29,11 @@ public class MyUserRepository : IMyUserRepository
             .FirstOrDefaultAsync();
     }
 
+    public async Task<MyUser?> GetOneById(Guid id)
+    {
+        return await dbContext.MyUsers.Where(u => u.Id == id).FirstOrDefaultAsync();
+    }
+
     public async Task<MyUser?> GetOneByUsername(string username)
     {
         var result = await dbContext.MyUsers.Where((item) => item.Username == username).FirstOrDefaultAsync();

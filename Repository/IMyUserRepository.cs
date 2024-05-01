@@ -8,5 +8,6 @@ public interface IMyUserRepository
     Task<MyUser?> GetOneByEmail(string email);
     Task<MyUser> RegisterNewUser(RegisterDto form);
     Task<MyUser?> GetOneByEmailOrUsername(string emailOrUsername);
+    Task<MyUser?> GetOneById(Guid id);
 
 }

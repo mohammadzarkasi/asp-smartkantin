@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using smartkantin.Data;
+using smartkantin.Middleware;
 using smartkantin.Models;
 using smartkantin.Repository;
 using smartkantin.Repository.Impl;
@@ -19,7 +20,7 @@ internal class Program
         // me-register dbcontext
         builder.Services.AddDbContext<DefaultMysqlDbContext>(options =>
         {
-            var connStr = builder.Configuration.GetConnectionString("mysql1") ?? "";
+            string connStr = builder.Configuration.GetConnectionString("mysql1") ?? "";
             Console.WriteLine("conn str: " + connStr);
             options.UseMySQL(connStr);
         });
@@ -78,10 +79,13 @@ internal class Program
 
 
 
+        // register services
         builder.Services.AddScoped<ITokenService, TokenService>();
 
+        // register middleware
+        builder.Services.AddTransient<MyJwtAuthMiddleware>();
 
-        // Add services to the container.
+
 
         // builder.Services.AddControllers();
         builder.Services.AddControllers().AddNewtonsoftJson(opt =>
@@ -119,7 +123,7 @@ internal class Program
                             Id = "Bearer"
                         }
                     },
-                    new string[]{}
+                    Array.Empty<string>()
                 }
             });
         });
@@ -144,6 +148,8 @@ internal class Program
         }
 
         app.UseHttpsRedirection();
+
+        app.UseMiddleware<MyJwtAuthMiddleware>();
 
         app.UseAuthentication();
         app.UseAuthorization();

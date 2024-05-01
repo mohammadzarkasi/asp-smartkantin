@@ -36,9 +36,11 @@ namespace smartkantin.Service.Impl
             Console.WriteLine("create claims");
             var claims = new List<Claim>
             {
-                new(ClaimTypes.Email, user.Email ?? ""),
-                new(ClaimTypes.Name, user.Username ?? ""),
-                new(ClaimTypes.GivenName, user.Id.ToString()),
+                // new(ClaimTypes.Email, user.Email),
+                // new(ClaimTypes.Name, user.Username),
+                // new(ClaimTypes.GivenName, user.Id.ToString()),
+                new("user_id",user.Id.ToString()),
+                new("timestamp",DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd-HH-mm-ss")),
             };
 
             Console.WriteLine("create creds");
@@ -62,6 +64,39 @@ namespace smartkantin.Service.Impl
 
             Console.WriteLine("write token");
             return tokenHandler.WriteToken(token);
+        }
+
+        public IEnumerable<Claim> GetClaimsFromToken(string token)
+        {
+            var validationParams = new TokenValidationParameters()
+            {
+                IssuerSigningKey = key,
+                ValidateIssuerSigningKey = true,
+                ValidateAudience = false,
+                ValidateIssuer = false,
+            };
+
+            var handler = new JwtSecurityTokenHandler();
+            var canValidate = false;
+            try
+            {
+                handler.ValidateToken(token, validationParams, out SecurityToken securityToken);
+                canValidate = securityToken != null;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            if (canValidate == false)
+            {
+                return [];
+            }
+
+
+            var jsonToken = handler.ReadJwtToken(token);
+
+            return jsonToken.Claims;
         }
     }
 }
