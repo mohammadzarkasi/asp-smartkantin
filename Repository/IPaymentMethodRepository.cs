@@ -9,6 +9,7 @@ namespace smartkantin.Repository
         Task<PaymentMethod> Add(PaymentMethod p);
         Task<PaymentMethod> Update(PaymentMethod p);
         Task Delete(PaymentMethod p);
-        // Task Delete(Guid id);
+
+        Task<IEnumerable<PaymentMethod>> GetManyByCode(string code);
     }
 }

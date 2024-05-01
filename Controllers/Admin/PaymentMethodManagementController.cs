@@ -17,6 +17,7 @@ public class PaymentMethodManagementController : ControllerBase
     {
         this.paymentMethodRepository = paymentMethodRepository;
     }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PaymentMethod>>> getAll()
     {
@@ -31,10 +32,20 @@ public class PaymentMethodManagementController : ControllerBase
         {
             return BadRequest(ModelState);
         }
+
+        var existings = await paymentMethodRepository.GetManyByCode(form.code);
+
+        if (existings.Any())
+        {
+            return BadRequest("code sudah dipakai");
+        }
+
         var r = await paymentMethodRepository.Add(new PaymentMethod
         {
             Name = form.name,
             Code = form.code,
+            NeedConfirmation = form.NeedConfirmation,
+            NeedUploadPayment = form.NeedUploadPayment,
         });
 
         if (r == null)
@@ -63,14 +74,31 @@ public class PaymentMethodManagementController : ControllerBase
         {
             return BadRequest(ModelState);
         }
+
         var p = await paymentMethodRepository.GetOneById(id);
         if (p == null)
         {
             return NotFound("tidak ditemukan");
         }
 
+        var existings = await paymentMethodRepository.GetManyByCode(form.code);
+        if (existings.Count() > 1)
+        {
+            return BadRequest("code sudah dipakai");
+        }
+        if (existings.Any())
+        {
+            var ex1 = existings.ElementAt(0);
+            if (ex1.Id != p.Id)
+            {
+                return BadRequest("code sudah dipakai");
+            }
+        }
+
         p.Code = form.code;
         p.Name = form.name;
+        p.NeedConfirmation = form.NeedUploadPayment;
+        p.NeedUploadPayment = form.NeedUploadPayment;
 
         var r = await paymentMethodRepository.Update(p);
 

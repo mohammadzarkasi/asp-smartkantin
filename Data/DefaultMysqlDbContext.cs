@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 // using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using smartkantin.Models;
+using smartkantin.Tools;
 
 namespace smartkantin.Data;
 
@@ -123,113 +124,17 @@ public class DefaultMysqlDbContext : DbContext
 
         builder.Entity<Food>().HasData([food1]);
 
+        // seeder payment method
+        var payMtd1 = new PaymentMethod
+        {
+            Id = GuidHelper.ParseGuid("fb88ca7b-502f-444c-8897-3fd3cb7c1771"),
+            Code = "cash",
+            CreatedOn = new DateTime(2024, 4, 30, 22, 0, 0),
+            Name = "Bayar Cash",
+            NeedConfirmation = 1,
+            NeedUploadPayment = 0,
+        };
 
-        // var roleAdmin = new IdentityRole { Name = "Admin" };
-        // roleAdmin.NormalizedName = roleAdmin.Name.ToUpper();
-
-        // var roleVendor = new IdentityRole { Name = "Vendor" };
-        // roleVendor.NormalizedName = roleVendor.Name.ToUpper();
-
-        // var roleUser = new IdentityRole { Name = "User" };
-        // roleUser.NormalizedName = roleUser.Name.ToUpper();
-
-        // var roles = new List<IdentityRole>(){
-        //     roleAdmin,
-        //     roleVendor,
-        //     roleUser,
-        // };
-
-        // builder.Entity<IdentityRole>().HasData(roles);
-
-        // 
-        // var userAdmin = new AppUser
-        // {
-        //     UserName = "admin",
-        //     Email = "admin@gmail.com"
-        // };
-
-        // var userVendor = new AppUser
-        // {
-        //     UserName = "vendor1",
-        //     Email = "vendor1@gmail.com"
-        // };
-
-        // var userCustomer = new AppUser
-        // {
-        //     UserName = "customer1",
-        //     Email = "customer1@gmail.com"
-        // };
-
-        // userAdmin.NormalizedEmail = userAdmin.Email.ToUpper();
-        // userAdmin.NormalizedUserName = userAdmin.UserName.ToUpper();
-
-        // userVendor.NormalizedEmail = userVendor.Email.ToUpper();
-        // userVendor.NormalizedUserName = userVendor.UserName.ToUpper();
-
-        // userCustomer.NormalizedEmail = userCustomer.Email.ToUpper();
-        // userCustomer.NormalizedUserName = userCustomer.UserName.ToUpper();
-
-        // var password = "123Mm,";
-        // var passwordHasher = new PasswordHasher<AppUser>();
-
-        // userAdmin.PasswordHash = passwordHasher.HashPassword(userAdmin, password);
-        // userVendor.PasswordHash = passwordHasher.HashPassword(userVendor, password);
-        // userCustomer.PasswordHash = passwordHasher.HashPassword(userCustomer, password);
-
-        // var users = new List<AppUser>() { userAdmin, userVendor, userCustomer };
-
-        // builder.Entity<AppUser>().HasData(users);
-
-        // var mapUserRoles = new List<IdentityUserRole<string>>();
-        // mapUserRoles.Add(new IdentityUserRole<string>
-        // {
-        //     UserId = userAdmin.Id,
-        //     RoleId = roleAdmin.Id,
-        // });
-        // mapUserRoles.Add(new IdentityUserRole<string>
-        // {
-        //     UserId = userAdmin.Id,
-        //     RoleId = roleUser.Id,
-        // });
-        // mapUserRoles.Add(new IdentityUserRole<string>
-        // {
-        //     UserId = userCustomer.Id,
-        //     RoleId = roleUser.Id,
-        // });
-        // mapUserRoles.Add(new IdentityUserRole<string>
-        // {
-        //     UserId = userVendor.Id,
-        //     RoleId = roleUser.Id,
-        // });
-        // mapUserRoles.Add(new IdentityUserRole<string>
-        // {
-        //     UserId = userVendor.Id,
-        //     RoleId = roleVendor.Id,
-        // });
-
-        // builder.Entity<IdentityUserRole<string>>().HasData(mapUserRoles);
-
-        // var vendor1 = new VendorAccount
-        // {
-        //     CreatedAt = DateTime.Now,
-        //     Name = "vendor maju",
-        //     PictPath = "",
-        //     UserId = userVendor.Id,
-        //     Id = Guid.NewGuid(),
-        // };
-
-        // builder.Entity<VendorAccount>().HasData(new List<VendorAccount>() { vendor1 });
-
-        // var food1 = new Food
-        // {
-        //     CreatedAt = DateTime.Now,
-        //     FoodPict = "",
-        //     Name = "jus jambu",
-        //     Price = 10000,
-        //     VendorId = vendor1.Id,
-        //     Id = Guid.NewGuid(),
-        // };
-
-        // builder.Entity<Food>().HasData(new List<Food>() { food1 });
+        builder.Entity<PaymentMethod>().HasData([payMtd1]);
     }
 }

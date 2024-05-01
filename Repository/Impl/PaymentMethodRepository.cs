@@ -14,6 +14,7 @@ namespace smartkantin.Repository.Impl
         }
         public async Task<PaymentMethod> Add(PaymentMethod p)
         {
+
             p.CreatedOn = DateTime.Now.ToUniversalTime();
 
             await dbContext.AddAsync(p);
@@ -49,9 +50,20 @@ namespace smartkantin.Repository.Impl
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<PaymentMethod>> GetManyByCode(string code)
+        {
+            return await dbContext
+                .PaymentMethods
+                .Where(p => p.Code == code && p.DeletedOn == null)
+                .ToListAsync();
+        }
+
         public async Task<PaymentMethod?> GetOneById(Guid id)
         {
-            return await dbContext.PaymentMethods.Where(p => p.DeletedOn == null && p.Id == id).FirstOrDefaultAsync();
+            return await dbContext
+                .PaymentMethods
+                .Where(p => p.DeletedOn == null && p.Id == id)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<PaymentMethod> Update(PaymentMethod p)
