@@ -10,4 +10,7 @@ public interface IMyUserRepository
     Task<MyUser?> GetOneByEmailOrUsername(string emailOrUsername);
     Task<MyUser?> GetOneById(Guid id);
 
+
+    Task<IEnumerable<MyRole>> GetRolesOfUser(MyUser user);
+
 }

@@ -70,4 +70,17 @@ public class LoginController : ControllerBase
 
         return Ok(token);
     }
+
+    [HttpGet("test-role")]
+    public IActionResult testRole()
+    {
+        var l = new List<object>(){
+            User.Identity,
+            User.Identity.IsAuthenticated,
+            User.Identity.Name,
+            User.Identity.AuthenticationType,
+            User.IsInRole("Admin"),
+        };
+        return Ok(l);
+    }
 }

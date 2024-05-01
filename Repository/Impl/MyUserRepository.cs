@@ -31,13 +31,28 @@ public class MyUserRepository : IMyUserRepository
 
     public async Task<MyUser?> GetOneById(Guid id)
     {
-        return await dbContext.MyUsers.Where(u => u.Id == id).FirstOrDefaultAsync();
+        return await dbContext
+            .MyUsers
+            // .Include(u => u.)
+            .Where(u => u.Id == id)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<MyUser?> GetOneByUsername(string username)
     {
         var result = await dbContext.MyUsers.Where((item) => item.Username == username).FirstOrDefaultAsync();
         return result;
+    }
+
+    public async Task<IEnumerable<MyRole>> GetRolesOfUser(MyUser user)
+    {
+        Console.WriteLine("roles of a user: " + user.Id);
+        return await dbContext
+            .MyRoles
+            // .Include(r => r.UserRoles)
+            //    .ThenInclude(ur => ur.User)
+            .Where(r => r.UserRoles.Any(ur => ur.UserId == user.Id))
+            .ToListAsync();
     }
 
     public async Task<MyUser> RegisterNewUser(RegisterDto form)

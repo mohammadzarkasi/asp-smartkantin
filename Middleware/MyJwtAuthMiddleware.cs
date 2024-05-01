@@ -20,11 +20,11 @@ namespace smartkantin.Middleware
         }
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            checkJwtHeader(context);
+            await checkJwtHeader(context);
             await next(context);
         }
 
-        private async void checkJwtHeader(HttpContext context)
+        private async Task checkJwtHeader(HttpContext context)
         {
             string headerAuthorizationBearer = context.Request.Headers.Authorization.Where(s => s?.StartsWith("Bearer ") ?? false).FirstOrDefault() ?? "";
             // Console.WriteLine("header auth bearer: " + headerAuthorizationBearer);
@@ -43,9 +43,9 @@ namespace smartkantin.Middleware
 
             string token = headerAuthorizationBearer[7..];
 
-            var claims = tokenService.GetClaimsFromToken(token);
-            string userId = claims.Where(c => c.Type == "user_id").FirstOrDefault()?.Value.ToString() ?? "";
-            string timestamp = claims.Where(c => c.Type == "timestamp").FirstOrDefault()?.Value.ToString() ?? "";
+            var jwtClaims = tokenService.GetClaimsFromToken(token);
+            string userId = jwtClaims.Where(c => c.Type == "user_id").FirstOrDefault()?.Value.ToString() ?? "";
+            string timestamp = jwtClaims.Where(c => c.Type == "timestamp").FirstOrDefault()?.Value.ToString() ?? "";
 
             if (timestamp.IsNullOrEmpty() == true || userId.IsNullOrEmpty() == true)
             {
@@ -63,17 +63,22 @@ namespace smartkantin.Middleware
             var sessionClaims = new List<Claim>(){
                     new(ClaimTypes.Name, user.Username),
                     new(ClaimTypes.Email, user.Email),
+                    new("user_id", user.Id.ToString()),
+                    // new(ClaimTypes.Authentication, user.Id.ToString()),
+                    // new(ClaimTypes.Upn, user.Id.ToString()),
+                    
                 };
 
-            // var roles = await roleRepository.GetAllByUser(user);
-            // foreach (var role in roles)
-            // {
-            //     var roleName = role.Role.Name;
-            //     Console.WriteLine("add role: " + roleName);
-            //     claims.Add(new Claim(ClaimTypes.Role, roleName));
-            // }
+            var roles = await userRepository.GetRolesOfUser(user);
+            foreach (var role in roles)
+            {
+                // var roleName = role.Role.Name;
+                // Console.WriteLine("add role: " + roleName);
+                sessionClaims.Add(new Claim(ClaimTypes.Role, role.Name));
+            }
 
-            var identity = new ClaimsIdentity(claims, "my jwt auth middleware");
+            // var identity = new ClaimsIdentity(claims, "my jwt auth middleware");
+            var identity = new ClaimsIdentity(sessionClaims, "custom");
 
             context.User = new ClaimsPrincipal(identity);
             Console.WriteLine("set claim identity done");

@@ -15,4 +15,8 @@ public class MyUser
     public string Status { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }
+
+
+    // Navigation property
+    public IEnumerable<MyUserRole> UserRoles {get;set;}
 }
