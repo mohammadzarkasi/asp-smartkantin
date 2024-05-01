@@ -76,6 +76,7 @@ internal class Program
         builder.Services.AddScoped<ICustomerCartRepository, CustomerCartRepository>();
         builder.Services.AddScoped<ICustomerOrderRepository, CustomerOrderRepository>();
         builder.Services.AddScoped<IMyUserRepository, MyUserRepository>();
+        builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
 
 
 
@@ -84,6 +85,18 @@ internal class Program
 
         // register middleware
         builder.Services.AddTransient<MyJwtAuthMiddleware>();
+
+
+        // register policy-role untuk [Authorize]
+        builder.Services.AddAuthorization(opt => {
+            opt.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+            
+        });
+        builder.Services.AddAuthentication(opt => {
+            opt.DefaultAuthenticateScheme = "forbidScheme";
+            opt.DefaultForbidScheme = "forbidScheme";
+            opt.AddScheme<MyAuthenticationHandler>("forbidScheme", "Handle Forbidden");
+        });
 
 
 

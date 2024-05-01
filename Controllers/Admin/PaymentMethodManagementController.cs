@@ -1,15 +1,26 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using smartkantin.Models;
+using smartkantin.Repository;
 
 namespace smartkantin.Controllers.Admin;
 
 [ApiController]
 [Route("/api/admin/payment-method", Name = "Management Payment Method")]
+[Authorize(Policy = "Admin")]
 public class PaymentMethodManagementController : ControllerBase
 {
-    [HttpGet]
-    public string getAll()
+    private readonly IPaymentMethodRepository paymentMethodRepository;
+
+    public PaymentMethodManagementController(IPaymentMethodRepository paymentMethodRepository)
     {
-        return "get All";
+        this.paymentMethodRepository = paymentMethodRepository;
+    }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<PaymentMethod>>> getAll()
+    {
+        var r= await paymentMethodRepository.GetAll();
+        return Ok(r);
     }
 
     [HttpPost("add")]
