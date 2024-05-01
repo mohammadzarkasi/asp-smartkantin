@@ -12,31 +12,56 @@ namespace smartkantin.Repository.Impl
         {
             this.dbContext = dbContext;
         }
-        public Task<PaymentMethod> Add(PaymentMethod p)
+        public async Task<PaymentMethod> Add(PaymentMethod p)
         {
-            throw new NotImplementedException();
+            p.CreatedOn = DateTime.Now.ToUniversalTime();
+
+            await dbContext.AddAsync(p);
+            await dbContext.SaveChangesAsync();
+
+            return p;
         }
 
-        public Task Delete(PaymentMethod p)
+        public async Task Delete(PaymentMethod p)
         {
-            throw new NotImplementedException();
+            // dbContext.Remove(p);
+            p.DeletedOn = DateTime.Now.ToUniversalTime();
+
+            dbContext.Update(p);
+
+            await dbContext.SaveChangesAsync();
         }
+
+        // public async Task Delete(Guid id)
+        // {
+        //     var item = await dbContext.PaymentMethods.FindAsync(id);
+        //     if(item != null)
+        //     {
+        //         await Delete(item);
+        //     }
+        // }
 
         public async Task<IEnumerable<PaymentMethod>> GetAll()
         {
             return await dbContext
                 .PaymentMethods
+                .Where(p => p.DeletedOn == null)
                 .ToListAsync();
         }
 
-        public Task<PaymentMethod> GetOneById(Guid id)
+        public async Task<PaymentMethod?> GetOneById(Guid id)
         {
-            throw new NotImplementedException();
+            return await dbContext.PaymentMethods.Where(p => p.DeletedOn == null && p.Id == id).FirstOrDefaultAsync();
         }
 
-        public Task<PaymentMethod> Update(PaymentMethod p)
+        public async Task<PaymentMethod> Update(PaymentMethod p)
         {
-            throw new NotImplementedException();
+            p.UpdatedOn = DateTime.Now.ToUniversalTime();
+
+            dbContext.Update(p);
+            await dbContext.SaveChangesAsync();
+
+            return p;
         }
     }
 }
