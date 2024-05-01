@@ -20,26 +20,25 @@ namespace smartkantin.Middleware
         }
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            await checkJwtHeader(context);
+            Tuple<string,string>? userIdAndTimestamp = checkJwtHeader(context);
+            if(userIdAndTimestamp != null)
+            {
+                var userAndRoles = await GetUserAndRoles(userIdAndTimestamp.Item1);
+                if(userAndRoles != null)    {
+                    setUserClaimsIdentity(context, userAndRoles.Item1, userAndRoles.Item2);
+                }
+            }
             await next(context);
         }
 
-        private async Task checkJwtHeader(HttpContext context)
+        private Tuple<string, string>? checkJwtHeader(HttpContext context)
         {
             string headerAuthorizationBearer = context.Request.Headers.Authorization.Where(s => s?.StartsWith("Bearer ") ?? false).FirstOrDefault() ?? "";
-            // Console.WriteLine("header auth bearer: " + headerAuthorizationBearer);
 
             if (headerAuthorizationBearer.IsNullOrEmpty() == true)
             {
-                return;
+                return null;
             }
-            // Console.WriteLine("header is not null and not empty: " + headerAuthorizationBearer.Length);
-
-            // if (headerAuthorizationBearer.StartsWith("Bearer ") == false)
-            // {
-            //     return;
-            // }
-            // Console.WriteLine("header is started with bearer");
 
             string token = headerAuthorizationBearer[7..];
 
@@ -49,31 +48,41 @@ namespace smartkantin.Middleware
 
             if (timestamp.IsNullOrEmpty() == true || userId.IsNullOrEmpty() == true)
             {
-                return;
+                return null;
             }
 
+            return new Tuple<string, string>(userId, timestamp);
+
+        }
+
+        private async Task<Tuple<MyUser, IEnumerable<MyRole>>?> GetUserAndRoles(string userId)
+        {
             var userIdGuid = GuidHelper.ParseGuid(userId);
+            
             Console.WriteLine("parsed guid: " + userIdGuid);
-            MyUser? user = await userRepository.GetOneById(userIdGuid);
+            
+            var user = await userRepository.GetOneById(userIdGuid);
             if (user == null)
             {
-                return;
+                return null;
             }
 
+            var roles = await userRepository.GetRolesOfUser(user);
+
+            return new Tuple<MyUser, IEnumerable<MyRole>>(user,roles);
+            
+        }
+
+        private static void setUserClaimsIdentity(HttpContext context, MyUser user, IEnumerable<MyRole> roles)
+        {
             var sessionClaims = new List<Claim>(){
                     new(ClaimTypes.Name, user.Username),
                     new(ClaimTypes.Email, user.Email),
                     new("user_id", user.Id.ToString()),
-                    // new(ClaimTypes.Authentication, user.Id.ToString()),
-                    // new(ClaimTypes.Upn, user.Id.ToString()),
-                    
                 };
 
-            var roles = await userRepository.GetRolesOfUser(user);
             foreach (var role in roles)
             {
-                // var roleName = role.Role.Name;
-                // Console.WriteLine("add role: " + roleName);
                 sessionClaims.Add(new Claim(ClaimTypes.Role, role.Name));
             }
 
@@ -82,22 +91,6 @@ namespace smartkantin.Middleware
 
             context.User = new ClaimsPrincipal(identity);
             Console.WriteLine("set claim identity done");
-
-
-            // Console.WriteLine("list claim:");
-            // foreach (var c in claims)
-            // {
-            //     Console.WriteLine(c.Type + " = " + c.Value);
-            // }
-            // Console.WriteLine("list claim end.");
-
-
-            // Console.WriteLine("header authorization: ");
-            // foreach (var h in headerAuthorization)
-            // {
-            //     Console.WriteLine(h);
-            // }
-            // Console.WriteLine("header end.");
         }
     }
 }

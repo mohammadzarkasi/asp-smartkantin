@@ -16,5 +16,20 @@ namespace smartkantin.Tools
             }
             return Guid.Empty;
         }
+
+        public static Guid? ParseGuidOrNull(string guid)
+        {
+            try
+            {
+                return Guid.Parse(guid);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("parse guid failed: " + guid);
+                Console.WriteLine("example of valid guid: " + Guid.NewGuid().ToString());
+                Console.WriteLine(e);
+            }
+            return null;
+        }
     }
 }
