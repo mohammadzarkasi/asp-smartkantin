@@ -77,6 +77,7 @@ internal class Program
         builder.Services.AddScoped<ICustomerOrderRepository, CustomerOrderRepository>();
         builder.Services.AddScoped<IMyUserRepository, MyUserRepository>();
         builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+        builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 
 
@@ -88,11 +89,12 @@ internal class Program
 
 
         // register policy-role untuk [Authorize]
-        builder.Services.AddAuthorization(opt => {
-            opt.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
-            
-        });
-        builder.Services.AddAuthentication(opt => {
+        // builder.Services.AddAuthorization(opt => {
+        //     opt.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+
+        // });
+        builder.Services.AddAuthentication(opt =>
+        {
             opt.DefaultAuthenticateScheme = "forbidScheme";
             opt.DefaultForbidScheme = "forbidScheme";
             opt.AddScheme<MyAuthenticationHandler>("forbidScheme", "Handle Forbidden");

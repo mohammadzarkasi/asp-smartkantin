@@ -1,22 +1,30 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using smartkantin.Models;
+using smartkantin.Repository;
 
 namespace smartkantin.Controllers.Admin;
 
 [ApiController]
 [Route("/api/admin/role")]
-[Authorize(Policy = "Admin")]
+[Authorize(Roles = "Admin")]
 public class MasterRoleController : ControllerBase
 {
-    [HttpGet]
-    public string getAll()
-    {
-        return "get all";
-    }
+    private readonly IRoleRepository roleRepository;
 
-    [HttpPost("add")]
-    public string add()
+    public MasterRoleController(IRoleRepository roleRepository)
     {
-        return "add";
+        this.roleRepository = roleRepository;
+    }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<MyRole>>> getAll()
+    {
+        var roles = await roleRepository.GetAll();
+        roles = roles.Select(r =>
+        {
+            r.Users = [];
+            return r;
+        });
+        return Ok(roles);
     }
 }

@@ -14,5 +14,5 @@ public class MyRole
     public DateTime? UpdatedOn { get; set; }
 
     // Navigation property
-    public IEnumerable<MyUserRole> UserRoles {get;set;}
+    public IEnumerable<MyUserRole> Users { get; set; }
 }

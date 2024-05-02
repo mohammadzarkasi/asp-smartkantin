@@ -9,8 +9,8 @@ public interface IMyUserRepository
     Task<MyUser> RegisterNewUser(RegisterDto form);
     Task<MyUser?> GetOneByEmailOrUsername(string emailOrUsername);
     Task<MyUser?> GetOneById(Guid id);
-
-
     Task<IEnumerable<MyRole>> GetRolesOfUser(MyUser user);
+    Task<IEnumerable<MyUser>> GetAll();
+    Task<MyUser?> AssignUserToRole(MyUser user, MyRole role);
 
 }

@@ -8,7 +8,7 @@ namespace smartkantin.Controllers.Admin;
 
 [ApiController]
 [Route("/api/admin/payment-method", Name = "Management Payment Method")]
-[Authorize(Policy = "Admin")]
+[Authorize(Roles = "Admin")]
 public class PaymentMethodManagementController : ControllerBase
 {
     private readonly IPaymentMethodRepository paymentMethodRepository;

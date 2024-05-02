@@ -10,6 +10,8 @@ public class MyUserDto
     public DateTime CreatedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }
 
+    public IEnumerable<MyUserRole> Roles { get; set; }
+
     public static MyUserDto FromMyUser(MyUser user)
     {
         var result = new MyUserDto
@@ -19,8 +21,15 @@ public class MyUserDto
             Username = user.Username,
             Status = user.Status,
             CreatedOn = user.CreatedOn,
-            UpdatedOn = user.UpdatedOn
+            UpdatedOn = user.UpdatedOn,
+            Roles = user.UserRoles,
         };
+
+        foreach (var ur in result.Roles)
+        {
+            ur.User = null;
+            ur.Role.Users = [];
+        }
 
         return result;
     }

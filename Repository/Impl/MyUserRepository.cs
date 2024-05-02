@@ -13,6 +13,31 @@ public class MyUserRepository : IMyUserRepository
         this.dbContext = dbContext;
     }
 
+    public async Task<MyUser?> AssignUserToRole(MyUser user, MyRole role)
+    {
+        var n = new MyUserRole
+        {
+            RoleId = role.Id,
+            UserId = user.Id,
+            CreatedOn = DateTime.Now.ToUniversalTime(),
+        };
+        await dbContext.AddAsync(n);
+        await dbContext.SaveChangesAsync();
+
+        var r = await GetOneById(user.Id);
+        return r;
+    }
+
+    public async Task<IEnumerable<MyUser>> GetAll()
+    {
+        var r = await dbContext
+            .MyUsers
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+            .ToListAsync();
+        return r;
+    }
+
     public async Task<MyUser?> GetOneByEmail(string email)
     {
         var result = await dbContext.MyUsers.Where((item) => item.Email == email).FirstOrDefaultAsync();
@@ -33,7 +58,8 @@ public class MyUserRepository : IMyUserRepository
     {
         return await dbContext
             .MyUsers
-            // .Include(u => u.)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
             .Where(u => u.Id == id)
             .FirstOrDefaultAsync();
     }
@@ -51,7 +77,7 @@ public class MyUserRepository : IMyUserRepository
             .MyRoles
             // .Include(r => r.UserRoles)
             //    .ThenInclude(ur => ur.User)
-            .Where(r => r.UserRoles.Any(ur => ur.UserId == user.Id))
+            .Where(r => r.Users.Any(ur => ur.UserId == user.Id))
             .ToListAsync();
     }
 
