@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using smartkantin.Dto;
@@ -9,6 +10,7 @@ namespace smartkantin.Controllers.Vendor;
 
 [ApiController]
 [Route("/api/vendor/profile")]
+[Authorize(Roles = "Vendor")]
 public class VendorProfileController : ControllerBase
 {
     // private readonly UserManager<AppUser> userManager;

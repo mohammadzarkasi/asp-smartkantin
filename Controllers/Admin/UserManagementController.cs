@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using smartkantin.Dto;
 using smartkantin.Models;
@@ -8,6 +9,7 @@ namespace smartkantin.Controllers.Admin;
 
 [ApiController]
 [Route("/api/admin/user-management")]
+[Authorize(Roles = "Admin")]
 public class UserManagementController : ControllerBase
 {
     private readonly IMyUserRepository userRepository;

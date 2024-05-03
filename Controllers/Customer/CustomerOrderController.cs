@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +10,7 @@ namespace smartkantin.Controllers.Customer;
 
 [ApiController]
 [Route("/api/customer/order")]
+[Authorize(Roles = "Customer")]
 public class CustomerOrderController : ControllerBase
 {
     // private readonly UserManager<AppUser> userManager;

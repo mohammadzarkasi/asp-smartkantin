@@ -10,7 +10,7 @@ namespace smartkantin.Controllers.Vendor;
 
 [ApiController]
 [Route("/api/vendor/food")]
-[Authorize]
+[Authorize(Roles = "Vendor")]
 public class VendorFoodMenuController : ControllerBase
 {
     private readonly IFoodRepository foodRepository;

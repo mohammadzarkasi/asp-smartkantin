@@ -1,14 +1,17 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using smartkantin.Dto;
 using smartkantin.Models;
 using smartkantin.Repository;
+using smartkantin.Tools;
 // using smartkantin.Tools;
 
 namespace smartkantin.Controllers.Customer;
 
 [ApiController]
 [Route("/api/customer/cart")]
+[Authorize(Roles = "Customer")]
 public class CustomerCartController : ControllerBase
 {
     // private readonly UserManager<AppUser> userManager;
@@ -24,107 +27,113 @@ public class CustomerCartController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<CustomerCartItem>>> GetAll()
     {
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("session tidak valid");
-        // }
-        // var items = await customerCartRepository.GetAllByUser(user);
-        // return Ok(items);
-        throw new NotImplementedException();
+        var id = SessionTools.GetCurrentUserId(User);
+        var items = await customerCartRepository.GetAllByUserId(id);
+        items = items.Select(i => {
+            i.User = null;
+            return i;
+        });
+        return Ok(items);
+        // throw new NotImplementedException();
     }
 
     [HttpPost("add")]
     public async Task<ActionResult<Food>> Add([FromBody] NewCartItemDto form)
     {
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("session tidak valid");
-        // }
+        if(ModelState.IsValid == false)
+        {
+            return BadRequest(ModelState);
+        }
 
-        // var food = await foodRepository.GetById(form.FoodId);
-        // if (food == null)
-        // {
-        //     return BadRequest("Item tidak valid");
-        // }
+        var userId = SessionTools.GetCurrentUserId(User);
+        
+        var food = await foodRepository.GetById(form.FoodId);
+        if (food == null)
+        {
+            return BadRequest("Item tidak valid");
+        }
 
-        // var existingItem = await customerCartRepository.GetOneByUserAndFoodId(user, form.FoodId);
+        var existingItem = await customerCartRepository.GetOneByFoodIdAndUserId(form.FoodId, userId);
 
-        // if (existingItem != null)
-        // {
-        //     existingItem.Qty += form.Qty;
-        //     var result = await customerCartRepository.Update(existingItem);
+        if (existingItem != null)
+        {
+            existingItem.Qty += form.Qty;
+            var result = await customerCartRepository.Update(existingItem);
 
-        //     if (result == null)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, "kesalahan menyimpan data");
-        //     }
-        //     return Ok(result);
-        // }
-        // else
-        // {
-        //     var newItem = new CustomerCartItem
-        //     {
-        //         FoodId = form.FoodId,
-        //         Qty = form.Qty,
-        //         UserId = user.Id
-        //     };
+            if (result == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "kesalahan menyimpan data");
+            }
+            result.User = null;
+            return Ok(result);
+        }
+        else
+        {
+            var newItem = new CustomerCartItem
+            {
+                FoodId = form.FoodId,
+                Qty = form.Qty,
+                UserId = userId
+            };
 
-        //     var result = await customerCartRepository.Add(newItem);
+            var result = await customerCartRepository.Add(newItem);
 
-        //     if (result == null)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, "kesalahan menyimpan data");
-        //     }
-        //     return Ok(result);
-        // }
-        throw new NotImplementedException();
+            if (result == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "kesalahan menyimpan data");
+            }
+            result.User = null;
+            return Ok(result);
+        }
+        // throw new NotImplementedException();
     }
 
     [HttpPost("update")]
     public async Task<ActionResult<CustomerCartItem>> Update([FromBody] UpdateCartItemDto form)
     {
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("session tidak valid");
-        // }
+        if(ModelState.IsValid == false)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var userId = SessionTools.GetCurrentUserId(User);
+        
 
         // var cartItem = await customerCartRepository.GetOneByUserAndId(user, form.Id);
-        // if (cartItem == null)
-        // {
-        //     return NotFound("data tidak ditemukan");
-        // }
+        var cartItem = await customerCartRepository.GetOneByIdAndUserId(form.Id, userId);
+        if (cartItem == null)
+        {
+            return NotFound("data tidak ditemukan");
+        }
 
-        // cartItem.Qty = form.Qty;
+        cartItem.Qty = form.Qty;
 
-        // var result = await customerCartRepository.Update(cartItem);
-        // if (result == null)
-        // {
-        //     return StatusCode(StatusCodes.Status500InternalServerError, "gagal menyimpan data");
-        // }
-        // return Ok(result);
-        throw new NotImplementedException();
+        var result = await customerCartRepository.Update(cartItem);
+        if (result == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "gagal menyimpan data");
+        }
+
+        result.User = null;
+
+        return Ok(result);
+        // throw new NotImplementedException();
     }
 
     [HttpGet("delete")]
     public async Task<ActionResult<string>> delete([FromQuery(Name = "id")] Guid id)
     {
-        throw new NotImplementedException();
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("session tidak valid");
-        // }
-        // var item = await customerCartRepository.GetOneByUserAndId(user, id);
-        // if (item == null)
-        // {
-        //     return NotFound("data tidak ditemukan");
-        // }
+        // throw new NotImplementedException();
+        var userId = SessionTools.GetCurrentUserId(User);
 
-        // await customerCartRepository.Delete(item);
+        var item = await customerCartRepository.GetOneByIdAndUserId( id, userId);
+        if (item == null)
+        {
+            return NotFound("data tidak ditemukan");
+        }
 
-        // return Ok("deleted");
+        await customerCartRepository.Delete(item);
+
+        return Ok("deleted");
     }
 }

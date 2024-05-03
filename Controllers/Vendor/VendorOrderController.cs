@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using smartkantin.Models;
@@ -8,6 +9,7 @@ namespace smartkantin.Controllers.Vendor;
 
 [ApiController]
 [Route("/api/vendor/order")]
+[Authorize(Roles = "Vendor")]
 public class VendorOrderController : ControllerBase
 {
     // private readonly UserManager<AppUser> userManager;

@@ -6,8 +6,11 @@ namespace smartkantin.Repository
     {
         Task<IEnumerable<CustomerCartItem>> GetAll();
         Task<IEnumerable<CustomerCartItem>> GetAllByUser(MyUser user);
-        Task<CustomerCartItem?> GetOneByUserAndFoodId(MyUser user, Guid foodId);
-        Task<CustomerCartItem?> GetOneByUserAndId(MyUser user, Guid id);
+        Task<IEnumerable<CustomerCartItem>> GetAllByUserId(Guid id);
+        Task<CustomerCartItem?> GetOneByFoodIdAndUser( Guid foodId, MyUser user);
+        Task<CustomerCartItem?> GetOneByFoodIdAndUserId(Guid foodId, Guid userId);
+        Task<CustomerCartItem?> GetOneByIdAndUser(Guid id, MyUser user);
+        Task<CustomerCartItem?> GetOneByIdAndUserId(Guid id, Guid userId);
         Task<CustomerCartItem> Add(CustomerCartItem item);
         Task<CustomerCartItem> Update(CustomerCartItem item);
         Task Delete(CustomerCartItem item);

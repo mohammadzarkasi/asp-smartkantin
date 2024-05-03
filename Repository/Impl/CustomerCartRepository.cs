@@ -34,24 +34,27 @@ namespace smartkantin.Repository.Impl
 
         public async Task<IEnumerable<CustomerCartItem>> GetAllByUser(MyUser user)
         {
+            return await GetAllByUserId(user.Id);
+        }
+
+        public async Task<IEnumerable<CustomerCartItem>> GetAllByUserId(Guid id)
+        {
             var result = await dbContext.CustomerCartItems
                 .Include(c => c.TheFood)
                     .ThenInclude(f => f.Vendor)
-                .Where(item => item.UserId == user.Id)
+                .Where(item => item.UserId == id)
                 .ToListAsync();
             return result;
         }
 
-        public async Task<CustomerCartItem?> GetOneByUserAndFoodId(MyUser user, Guid foodId)
+        public async Task<CustomerCartItem?> GetOneByFoodIdAndUser(Guid foodId, MyUser user)
         {
-            var result = await dbContext.CustomerCartItems.Where(item => item.UserId == user.Id && item.FoodId == foodId).FirstOrDefaultAsync();
-            return result;
+            return await GetOneByFoodIdAndUserId(foodId, user.Id);
         }
 
-        public async Task<CustomerCartItem?> GetOneByUserAndId(MyUser user, Guid id)
+        public async Task<CustomerCartItem?> GetOneByIdAndUser(Guid id, MyUser user)
         {
-            var result = await dbContext.CustomerCartItems.Where(item => item.UserId == user.Id && item.Id == id).FirstOrDefaultAsync();
-            return result;
+            return await GetOneByIdAndUserId(id, user.Id);
         }
 
         public async Task<CustomerCartItem> Update(CustomerCartItem item)
@@ -63,6 +66,25 @@ namespace smartkantin.Repository.Impl
             await dbContext.SaveChangesAsync();
 
             return item;
+        }
+
+        public async Task<CustomerCartItem?> GetOneByFoodIdAndUserId(Guid foodId, Guid userId)
+        {
+            Console.WriteLine("food id: " + foodId + ", " + userId);
+            var result = await dbContext
+                .CustomerCartItems
+                .Where(item => item.UserId == userId && item.FoodId == foodId)
+                .FirstOrDefaultAsync();
+            return result;
+        }
+
+        public async Task<CustomerCartItem?> GetOneByIdAndUserId(Guid id, Guid userId)
+        {
+            var result = await dbContext
+                .CustomerCartItems
+                .Where(item => item.UserId == userId && item.Id == id)
+                .FirstOrDefaultAsync();
+            return result;
         }
     }
 }
