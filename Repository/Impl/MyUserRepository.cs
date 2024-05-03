@@ -28,6 +28,18 @@ public class MyUserRepository : IMyUserRepository
         return r;
     }
 
+    public int CountAdmin()
+    {
+        var r =  dbContext
+            .MyUserRoles
+            .Include(ur => ur.Role)
+            .Where(r => r.Role.Name == "Admin")
+            .Select(r => r.RoleId)
+            .Count();
+        
+        return r;
+    }
+
     public async Task<IEnumerable<MyUser>> GetAll()
     {
         var r = await dbContext
@@ -70,6 +82,30 @@ public class MyUserRepository : IMyUserRepository
         return result;
     }
 
+    public async Task<MyUserRole?> GetOneUserRoleById(Guid id)
+    {
+        return await dbContext
+            .MyUserRoles
+            .Include(ur => ur.Role)
+            .Where(r => r.Id == id)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<MyUserRole?> GetOneUserRoleByUserAndRole(MyUser user, MyRole role)
+    {
+        return await this.GetOneUserRoleByUserAndRole(user.Id, role.Id);
+    }
+
+    public async Task<MyUserRole?> GetOneUserRoleByUserAndRole(Guid userId, Guid roleId)
+    {
+        var r = await dbContext
+            .MyUserRoles
+            .Where(ur => ur.UserId == userId && ur.RoleId == roleId)
+            .FirstOrDefaultAsync();
+
+        return r;
+    }
+
     public async Task<IEnumerable<MyRole>> GetRolesOfUser(MyUser user)
     {
         Console.WriteLine("roles of a user: " + user.Id);
@@ -79,6 +115,17 @@ public class MyUserRepository : IMyUserRepository
             //    .ThenInclude(ur => ur.User)
             .Where(r => r.Users.Any(ur => ur.UserId == user.Id))
             .ToListAsync();
+    }
+
+    public async Task<bool> IsUserHasRole(Guid userId, Guid roleId)
+    {
+        var r = await this.GetOneUserRoleByUserAndRole(userId, roleId);
+
+        if(r == null)
+        {
+            return false;
+        }
+        return true;
     }
 
     public async Task<MyUser> RegisterNewUser(RegisterDto form)
@@ -98,5 +145,9 @@ public class MyUserRepository : IMyUserRepository
         return newUser;
     }
 
-
+    public async Task RemoveUserFromRole(MyUserRole userRole)
+    {
+        dbContext.Remove(userRole);
+        await dbContext.SaveChangesAsync();
+    }
 }

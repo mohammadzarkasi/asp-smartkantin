@@ -12,5 +12,14 @@ public interface IMyUserRepository
     Task<IEnumerable<MyRole>> GetRolesOfUser(MyUser user);
     Task<IEnumerable<MyUser>> GetAll();
     Task<MyUser?> AssignUserToRole(MyUser user, MyRole role);
+    Task<bool> IsUserHasRole(Guid userId, Guid roleId);
 
+
+
+
+    Task RemoveUserFromRole(MyUserRole userRole);
+    Task<MyUserRole?> GetOneUserRoleByUserAndRole(MyUser user, MyRole role);
+    Task<MyUserRole?> GetOneUserRoleByUserAndRole(Guid userId, Guid roleId);
+    Task<MyUserRole?> GetOneUserRoleById(Guid id);
+    int CountAdmin();
 }
