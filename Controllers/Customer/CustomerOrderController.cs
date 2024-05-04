@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using smartkantin.Models;
 using smartkantin.Repository;
+using smartkantin.Tools;
 // using smartkantin.Tools;
 
 namespace smartkantin.Controllers.Customer;
@@ -26,93 +27,122 @@ public class CustomerOrderController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<CustomerOrder>>> GetAll()
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
         // var user = await SessionTools.GetCurrentUser(userManager, User);
         // if (user == null)
         // {
         //     return BadRequest("session tidak valid");
         // }
-        // var result = await customerOrderRepository.GetAllByCustomer(user);
-        // return Ok(result);
+        var userId = SessionTools.GetCurrentUserId(User);
+        var result = await customerOrderRepository.GetAllByCustomerId(userId);
+
+        result = result.Select(i =>
+        {
+            // i.Customer.Password = "";
+            // i.Customer.UserRoles = [];
+            i.Customer = null;
+            return i;
+        }).ToList();
+
+        return Ok(result);
     }
 
     [HttpGet("add")]
     public async Task<IActionResult> Add()
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
         // var user = await SessionTools.GetCurrentUser(userManager, User);
         // if (user == null)
         // {
         //     return BadRequest("session tidak valid");
         // }
 
-        // var cartItems = await customerCartRepository.GetAllByUser(user);
-        // if(cartItems.IsNullOrEmpty() == true)
-        // {
-        //     return BadRequest("cart masih kosong");
-        // }
+        var userId = SessionTools.GetCurrentUserId(User);
 
-        // var newOrder = new CustomerOrder{
-        //     CustomerId = user.Id,
-        //     Id = Guid.NewGuid(),
-        //     CreatedOn = DateTime.Now,
-        // };
+        var cartItems = await customerCartRepository.GetAllByUserId(userId);
+        if (cartItems.IsNullOrEmpty() == true)
+        {
+            return BadRequest("cart masih kosong");
+        }
 
-        // var orderPerVendors = new List<CustomerOrderPerVendor>();
-        // foreach(var cart in cartItems)
-        // {
-        //     var sudahAdaVendor = false;
-        //     foreach(var orderVendor in orderPerVendors)
-        //     {
-        //         if(orderVendor.VendorId == cart.TheFood.VendorId)
-        //         {
-        //             sudahAdaVendor = true;
-        //             break;
-        //         }
-        //     }
+        var newOrder = new CustomerOrder
+        {
+            CustomerId = userId,
+            Id = Guid.NewGuid(),
+            CreatedOn = DateTime.Now.ToUniversalTime(),
+        };
 
-        //     if(sudahAdaVendor == false)
-        //     {
-        //         orderPerVendors.Add(new CustomerOrderPerVendor{
-        //             Id = Guid.NewGuid(),
-        //             OrderId = newOrder.Id,
-        //             VendorId = cart.TheFood.VendorId,
-        //             TotalPrice = 0,
-        //             CreatedOn = DateTime.Now,
-        //         });
-        //     }
-        // }
+        var orderPerVendors = new List<CustomerOrderPerVendor>();
+        foreach (var cart in cartItems)
+        {
+            var sudahAdaVendor = false;
+            foreach (var orderVendor in orderPerVendors)
+            {
+                if (orderVendor.VendorId == cart.TheFood.VendorId)
+                {
+                    sudahAdaVendor = true;
+                    break;
+                }
+            }
 
-        // foreach(var orderVendor in orderPerVendors)
-        // {
-        //     foreach(var cart in cartItems)
-        //     {
-        //         if(cart.TheFood.VendorId == orderVendor.VendorId)
-        //         {
-        //             var subtotal = cart.Qty * cart.TheFood.Price;
-        //             orderVendor.orderDetails.Add(new CustomerOrderDetail{
-        //                 FoodId = cart.FoodId,
-        //                 FoodNameSnapshot = cart.TheFood.Name,
-        //                 Id = Guid.NewGuid(),
-        //                 OrderPerVendorId = orderVendor.Id,
-        //                 PriceSnapshot = cart.TheFood.Price,
-        //                 Qty = cart.Qty,
-        //                 Subtotal = subtotal,
-        //                 VendorNameSnapshot = cart.TheFood.Vendor.Name,
-        //                 CreatedOn = DateTime.Now,
-        //             });
-        //             orderVendor.TotalPrice += subtotal;
-        //         }
-        //     }
-        // }
+            if (sudahAdaVendor == false)
+            {
+                orderPerVendors.Add(new CustomerOrderPerVendor
+                {
+                    Id = Guid.NewGuid(),
+                    OrderId = newOrder.Id,
+                    VendorId = cart.TheFood.VendorId,
+                    TotalPrice = 0,
+                    CreatedOn = DateTime.Now,
+                });
+            }
+        }
 
-        // newOrder.orderPerVendors = orderPerVendors;
-        // newOrder.TotalPrice = orderPerVendors.Select(i => i.TotalPrice).Sum();
+        foreach (var orderVendor in orderPerVendors)
+        {
+            foreach (var cart in cartItems)
+            {
+                if (cart.TheFood.VendorId == orderVendor.VendorId)
+                {
+                    var subtotal = cart.Qty * cart.TheFood.Price;
+                    orderVendor.orderDetails.Add(new CustomerOrderDetail
+                    {
+                        FoodId = cart.FoodId,
+                        FoodNameSnapshot = cart.TheFood.Name,
+                        Id = Guid.NewGuid(),
+                        OrderPerVendorId = orderVendor.Id,
+                        PriceSnapshot = cart.TheFood.Price,
+                        Qty = cart.Qty,
+                        Subtotal = subtotal,
+                        VendorNameSnapshot = cart.TheFood.Vendor.Name,
+                        CreatedOn = DateTime.Now,
+                    });
+                    orderVendor.TotalPrice += subtotal;
+                }
+            }
+        }
 
-        // await customerOrderRepository.Add(newOrder);
+        newOrder.orderPerVendors = orderPerVendors;
+        newOrder.TotalPrice = orderPerVendors.Select(i => i.TotalPrice).Sum();
 
-        // var result = await customerOrderRepository.GetOneByIdAndCustomer(user, newOrder.Id);
-        // return Ok(result);
+        await customerOrderRepository.Add(newOrder);
+
+        var result = await customerOrderRepository.GetOneByIdAndCustomerId(newOrder.Id, userId);
+        if (result == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "terjadi kesalahan dalam menyimpan data");
+        }
+        result.orderPerVendors = result.orderPerVendors.Select(i =>
+        {
+            i.Vendor.User = null;
+            return i;
+        }).ToList();
+
+        // result.Customer.UserRoles = [];
+        // result.Customer.Password = "";
+        result.Customer = null;
+
+        return Ok(result);
 
 
         // var vendors = cartItems.Select(c => c.TheFood.Vendor).Distinct();
