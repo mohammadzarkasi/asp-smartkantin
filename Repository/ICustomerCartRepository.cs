@@ -14,5 +14,6 @@ namespace smartkantin.Repository
         Task<CustomerCartItem> Add(CustomerCartItem item);
         Task<CustomerCartItem> Update(CustomerCartItem item);
         Task Delete(CustomerCartItem item);
+        Task DeleteByFoodIdAndUserId(Guid foodId, Guid userId);
     }
 }

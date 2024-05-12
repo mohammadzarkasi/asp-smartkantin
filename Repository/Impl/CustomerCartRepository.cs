@@ -86,5 +86,21 @@ namespace smartkantin.Repository.Impl
                 .FirstOrDefaultAsync();
             return result;
         }
+
+        public async Task DeleteByFoodIdAndUserId(Guid foodId, Guid userId)
+        {
+            var target = await dbContext
+                .CustomerCartItems
+                .Where(c => c.FoodId == foodId && c.UserId == userId)
+                .FirstOrDefaultAsync();
+            
+            if(target == null)
+            {
+                return;
+            }
+
+            dbContext.Remove(target);
+            await dbContext.SaveChangesAsync();
+        }
     }
 }

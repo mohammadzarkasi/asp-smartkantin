@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Crypto.Prng;
 using smartkantin.Data;
 using smartkantin.Models;
 
@@ -7,10 +8,12 @@ namespace smartkantin.Repository.Impl
     public class CustomerOrderRepository : ICustomerOrderRepository
     {
         private readonly DefaultMysqlDbContext dbContext;
+        private readonly ICustomerCartRepository customerCartRepository;
 
-        public CustomerOrderRepository(DefaultMysqlDbContext dbContext)
+        public CustomerOrderRepository(DefaultMysqlDbContext dbContext, ICustomerCartRepository customerCartRepository)
         {
             this.dbContext = dbContext;
+            this.customerCartRepository = customerCartRepository;
         }
         public Task<CustomerOrder> Add(CustomerOrder order, IEnumerable<CustomerOrderDetail> details)
         {
@@ -19,8 +22,20 @@ namespace smartkantin.Repository.Impl
 
         public async Task<CustomerOrder> Add(CustomerOrder order)
         {
+            var transaction = dbContext.Database.BeginTransaction();
+
             await dbContext.AddAsync(order);
             await dbContext.SaveChangesAsync();
+
+            foreach(var ov in order.orderPerVendors)
+            {
+                foreach(var d in ov.orderDetails)
+                {
+                    await customerCartRepository.DeleteByFoodIdAndUserId(d.FoodId, order.CustomerId);
+                }
+            }
+
+            transaction.Commit();
 
             return order;
         }
