@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using smartkantin.Models;
 using smartkantin.Repository;
+using smartkantin.Tools;
 // using smartkantin.Tools;
 
 namespace smartkantin.Controllers.Vendor;
@@ -25,21 +26,20 @@ public class VendorOrderController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<CustomerOrder>>> GetAll()
     {
-        Console.WriteLine("user: " + User?.Identity?.IsAuthenticated);
-        return NotFound();
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("session tidak valid");
-        // }
+        var userId = SessionTools.GetCurrentUserId(User);   
+        var vendorMe = await vendorRepository.GetByUserId(userId);
+        if(vendorMe == null)
+        {
+            return BadRequest("Data vendor tidak valid");
+        }
+        
+        var orders = await vendorOrderRepository.GetAllByVendor(vendorMe);
 
-        // var vendorMe = await vendorRepository.GetByUserId(user.Id);
-        // if (vendorMe == null)
-        // {
-        //     return BadRequest("data vendor tidak valid");
-        // }
+        orders = orders.Select(o => {
+            o.Vendor = null;
+            return o;
+        });
 
-        // var orders = await vendorOrderRepository.GetAllByVendor(vendorMe);
-        // return Ok(orders);
+        return Ok(orders);
     }
 }
