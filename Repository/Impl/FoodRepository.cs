@@ -13,6 +13,7 @@ public class FoodRepository : IFoodRepository
     }
     public async Task<Food> Add(Food item)
     {
+        item.CreatedOn = DateTime.Now.ToUniversalTime();
         await dbContext.AddAsync(item);
         await Save();
         return item;
@@ -34,9 +35,12 @@ public class FoodRepository : IFoodRepository
         return result;
     }
 
-    public async Task<IEnumerable<Food>> GetAllByVendor(Guid VendorId)
+    public async Task<IEnumerable<Food>> GetAllByVendorId(Guid VendorId)
     {
-        var result = await dbContext.Foods.Where(f => f.VendorId == VendorId && f.DeletedOn == null).ToListAsync();
+        var result = await dbContext
+            .Foods
+            .Where(f => f.VendorId == VendorId && f.DeletedOn == null)
+            .ToListAsync();
         return result;
     }
 
@@ -59,6 +63,7 @@ public class FoodRepository : IFoodRepository
 
     public async Task<Food> Update(Food item)
     {
+        item.UpdatedOn = DateTime.Now.ToUniversalTime();
         dbContext.Update(item);
         await Save();
         return item;

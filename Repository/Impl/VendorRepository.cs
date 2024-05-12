@@ -15,7 +15,8 @@ public class VendorRepository : IVendorRepository
     public async Task<VendorAccount> Add(VendorAccount item)
     {
         await dbContext.AddAsync(item);
-        await this.Save();
+        // await this.Save();
+        await dbContext.SaveChangesAsync();
         return item;
         // throw new NotImplementedException();
     }
@@ -24,7 +25,8 @@ public class VendorRepository : IVendorRepository
     {
         // throw new NotImplementedException();
         dbContext.Remove(item);
-        await this.Save();
+        // await this.Save();
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<VendorAccount>> GetAll()
@@ -43,22 +45,28 @@ public class VendorRepository : IVendorRepository
 
     public async Task<VendorAccount?> GetByUser(MyUser user)
     {
-        var result = await dbContext.Vendors.Where(v => v.UserId == user.Id).FirstOrDefaultAsync();
+        return await GetByUserId(user.Id);   
+    }
+
+    public async Task<VendorAccount?> GetByUserId(Guid userId)
+    {
+        var result = await dbContext.Vendors.Where(v => v.UserId == userId).FirstOrDefaultAsync();
         return result;
     }
 
-    public async Task Save()
-    {
-        // throw new NotImplementedException();
-        // dbContext.SaveChanges();
-        await dbContext.SaveChangesAsync();
-    }
+    // public async Task Save()
+    // {
+    //     // throw new NotImplementedException();
+    //     // dbContext.SaveChanges();
+    //     await dbContext.SaveChangesAsync();
+    // }
 
     public async Task<VendorAccount> Update(VendorAccount item)
     {
         // throw new NotImplementedException();
         dbContext.Update(item);
-        await Save();
+        // await Save();
+        await dbContext.SaveChangesAsync();
         return item;
     }
 }

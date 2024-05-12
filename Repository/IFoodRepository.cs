@@ -4,7 +4,7 @@ namespace smartkantin.Repository;
 public interface IFoodRepository
 {
     Task<IEnumerable<Food>> GetAll();
-    Task<IEnumerable<Food>> GetAllByVendor(Guid VendorId);
+    Task<IEnumerable<Food>> GetAllByVendorId(Guid VendorId);
     Task<Food?> GetById(Guid id);
     Task<Food?> GetByIdAndVendorId(Guid id, Guid VendorId);
     Task<Food> Add(Food item);

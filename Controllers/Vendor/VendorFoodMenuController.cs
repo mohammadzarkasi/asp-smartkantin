@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using smartkantin.Dto;
 using smartkantin.Models;
 using smartkantin.Repository;
+using smartkantin.Tools;
 // using smartkantin.Tools;
 
 namespace smartkantin.Controllers.Vendor;
@@ -27,131 +28,123 @@ public class VendorFoodMenuController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<Food>>> GetAll()
     {
-        throw new NotImplementedException();
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("user tidak ditemukan, " + user);
-        // }
-        // var vendorMe = await vendorRepository.GetByUserId(user?.Id ?? "");
-        // var result = await foodRepository.GetAllByVendor(vendorMe?.Id ?? Guid.Empty);
-        // // return Ok("get all");
-        // return Ok(result);
+        var userId = SessionTools.GetCurrentUserId(User);   
+        var vendorMe = await vendorRepository.GetByUserId(userId);
+        if(vendorMe == null)
+        {
+            return BadRequest("Data vendor tidak valid");
+        }
+        var result = await foodRepository.GetAllByVendorId(vendorMe.Id);
+
+        result = result.Select(i => {
+            i.Vendor = null;
+            return i;
+        });
+
+        return Ok(result);
     }
 
     [HttpPost("add")]
     public async Task<ActionResult<Food>> Add([FromBody] NewFoodDto form)
     {
-        throw new NotImplementedException();
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("user tidak ditemukan, " + user);
-        // }
-        // var vendorMe = await vendorRepository.GetByUserId(user?.Id ?? "");
-        // if (vendorMe == null)
-        // {
-        //     return BadRequest("Data Vendor tidak valid");
-        // }
-        // // return "add";
-        // var newFood = new Food
-        // {
-        //     CreatedOn = DateTime.Now,
-        //     Name = form.Name,
-        //     Price = form.Price,
-        //     VendorId = vendorMe.Id,
-        //     FoodPict = "",
-        // };
+        var userId = SessionTools.GetCurrentUserId(User);   
+        var vendorMe = await vendorRepository.GetByUserId(userId);
+        if(vendorMe == null)
+        {
+            return BadRequest("Data vendor tidak valid");
+        }
+        
+        var newFood = new Food
+        {
+            Name = form.Name,
+            Price = form.Price,
+            VendorId = vendorMe.Id,
+            FoodPict = "",
+        };
 
-        // var result = await foodRepository.Add(newFood);
+        var result = await foodRepository.Add(newFood);
 
-        // return Ok(result);
+        if(result == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "kesalahan menyimpan data");
+        }
+
+        result.Vendor = null;
+
+        return Ok(result);
     }
 
 
     [HttpPost("update")]
     public async Task<ActionResult<Food>> Update([FromBody] NewFoodDto form, [FromQuery(Name = "id")] Guid id)
     {
-        throw new NotImplementedException();
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("session tidak valid");
-        // }
+        var userId = SessionTools.GetCurrentUserId(User);   
+        var vendorMe = await vendorRepository.GetByUserId(userId);
+        if(vendorMe == null)
+        {
+            return BadRequest("Data vendor tidak valid");
+        }
+        
+        var food = await foodRepository.GetByIdAndVendorId(id, vendorMe.Id);
+        if (food == null)
+        {
+            return NotFound("data tidak ditemukan");
+        }
 
-        // var vendorMe = await vendorRepository.GetByUserId(user.Id);
-        // if (vendorMe == null)
-        // {
-        //     return BadRequest("data vendor tidak valid");
-        // }
+        food.Name = form.Name;
+        food.Price = form.Price;
 
-        // var food = await foodRepository.GetByIdAndVendorId(id, vendorMe.Id);
-        // if (food == null)
-        // {
-        //     return NotFound("data tidak ditemukan");
-        // }
+        var result = await foodRepository.Update(food);
 
-        // food.Name = form.Name;
-        // food.Price = form.Price;
+        if (result == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "gagal update");
+        }
 
-        // var result = await foodRepository.Update(food);
+        result.Vendor = null;
 
-        // if (result == null)
-        // {
-        //     return StatusCode(StatusCodes.Status500InternalServerError, "gagal update");
-        // }
-        // return Ok(result);
+        return Ok(result);
     }
 
     [HttpGet("delete")]
     public async Task<IActionResult> DeleteFood([FromQuery(Name = "id")] Guid id)
     {
-        throw new NotImplementedException();
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("session tidak valid");
-        // }
+        var userId = SessionTools.GetCurrentUserId(User);   
+        var vendorMe = await vendorRepository.GetByUserId(userId);
+        if(vendorMe == null)
+        {
+            return BadRequest("Data vendor tidak valid");
+        }
+        
+        var food = await foodRepository.GetByIdAndVendorId(id, vendorMe.Id);
+        if (food == null)
+        {
+            return NotFound("data tidak ditemukan");
+        }
 
-        // var vendorMe = await vendorRepository.GetByUserId(user.Id);
-        // if (vendorMe == null)
-        // {
-        //     return BadRequest("data vendor tidak valid");
-        // }
+        await foodRepository.FlagDelete(food);
 
-        // var food = await foodRepository.GetByIdAndVendorId(id, vendorMe.Id);
-        // if (food == null)
-        // {
-        //     return NotFound("data tidak ditemukan");
-        // }
-
-        // await foodRepository.FlagDelete(food);
-
-        // return Ok("ok");
+        return Ok("ok");
     }
 
     [HttpGet("detail")]
     public async Task<ActionResult<Food>> GetOne([FromQuery(Name = "id")] Guid id)
     {
-        throw new NotImplementedException();
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("session tidak valid");
-        // }
+        var userId = SessionTools.GetCurrentUserId(User);   
+        var vendorMe = await vendorRepository.GetByUserId(userId);
+        if(vendorMe == null)
+        {
+            return BadRequest("Data vendor tidak valid");
+        }
 
-        // var vendorMe = await vendorRepository.GetByUserId(user.Id);
-        // if (vendorMe == null)
-        // {
-        //     return BadRequest("data vendor tidak valid");
-        // }
+        var food = await foodRepository.GetByIdAndVendorId(id, vendorMe.Id);
+        if (food == null)
+        {
+            return NotFound("data tidak ditemukan");
+        }
 
-        // var food = await foodRepository.GetByIdAndVendorId(id, vendorMe.Id);
-        // if (food == null)
-        // {
-        //     return NotFound("data tidak ditemukan");
-        // }
+        food.Vendor = null;
 
-        // return Ok(food);
+        return Ok(food);
     }
 }

@@ -9,8 +9,8 @@ namespace smartkantin.Controllers.Customer;
 public class CustomerPaymentController : ControllerBase
 {
     [HttpGet]
-    public string GetAll()
+    public IActionResult GetAll()
     {
-        return "get all";
+        return Ok("get All");
     }
 }
