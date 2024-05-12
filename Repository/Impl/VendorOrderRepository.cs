@@ -41,6 +41,7 @@ namespace smartkantin.Repository.Impl
             return await dbContext
                 .CustomerOrderPerVendors
                 .Include(ord => ord.Order)
+                    .ThenInclude(ord => ord.Customer)
                 .Where(ord => ord.VendorId == vendor.Id)
                 .ToListAsync();
         }
@@ -48,6 +49,19 @@ namespace smartkantin.Repository.Impl
         public Task<CustomerOrder?> GetById(Guid id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<CustomerOrderPerVendor?> GetOneByIdAndVendorId(Guid orderId, Guid vendorId)
+        {
+            Console.WriteLine("get detail order, id order: " + orderId + ", vendor: " + vendorId);
+            return await dbContext
+                .CustomerOrderPerVendors
+                .Include(ordVendor => ordVendor.Order)
+                    .ThenInclude(ord => ord.Customer)
+                .Include(ordVendor => ordVendor.orderDetails)
+                .Where(ordVendor => ordVendor.VendorId == vendorId 
+                        && ordVendor.Order.Id == orderId)
+                .FirstOrDefaultAsync();
         }
 
         public Task<CustomerOrder?> MarkAsDone(CustomerOrder order)

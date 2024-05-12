@@ -11,5 +11,6 @@ namespace smartkantin.Repository
         Task<CustomerOrder?> Accept(CustomerOrder order);
         Task<CustomerOrder?> NotifyOrderDone(CustomerOrder order);
         Task<CustomerOrder?> MarkAsDone(CustomerOrder order);
+        Task<CustomerOrderPerVendor?> GetOneByIdAndVendorId(Guid orderId, Guid vendorId);
     }
 }

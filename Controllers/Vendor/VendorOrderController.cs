@@ -23,8 +23,9 @@ public class VendorOrderController : ControllerBase
         this.vendorRepository = vendorRepository;
         this.vendorOrderRepository = vendorOrderRepository;
     }
+
     [HttpGet]
-    public async Task<ActionResult<List<CustomerOrder>>> GetAll()
+    public async Task<ActionResult<List<CustomerOrderPerVendor>>> GetAll()
     {
         var userId = SessionTools.GetCurrentUserId(User);   
         var vendorMe = await vendorRepository.GetByUserId(userId);
@@ -37,9 +38,35 @@ public class VendorOrderController : ControllerBase
 
         orders = orders.Select(o => {
             o.Vendor = null;
+            o.Order.Customer.Password = "";
+            o.Order.Customer.Email = "";
             return o;
         });
 
         return Ok(orders);
+    }
+
+    [HttpGet("detail")]
+    public async Task<ActionResult<CustomerOrderPerVendor>> Detail([FromQuery(Name = "id")] Guid id)
+    {
+        var userId = SessionTools.GetCurrentUserId(User);
+        var vendorMe = await vendorRepository.GetByUserId(userId);
+        if(vendorMe == null)
+        {
+            return BadRequest("Data vendor tidak valid");
+        }
+
+        var order = await vendorOrderRepository.GetOneByIdAndVendorId(id, vendorMe.Id);
+
+        if(order == null)
+        {
+            return NotFound("data tidak ditemukan");
+        }
+
+        order.Vendor = null;
+        order.Order.Customer.Password = "";
+        order.Order.Customer.Email = "";
+
+        return Ok(order);
     }
 }
