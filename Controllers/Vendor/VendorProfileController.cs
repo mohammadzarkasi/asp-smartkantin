@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using smartkantin.Dto;
 using smartkantin.Models;
 using smartkantin.Repository;
+using smartkantin.Tools;
 // using smartkantin.Tools;
 
 namespace smartkantin.Controllers.Vendor;
@@ -24,55 +25,55 @@ public class VendorProfileController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<VendorAccount>> MyProfile()
     {
-        throw new NotImplementedException();
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("user tidak ditemukan, " + user);
-        // }
-        // var vendorAccount = await vendorRepository.GetByUserId(user?.Id ?? "");
-        // if (vendorAccount == null)
-        // {
-        //     return NotFound("data vendor tidak ditemukan");
-        // }
-        // return Ok(vendorAccount);
+        var userId = SessionTools.GetCurrentUserId(User);   
+        var vendorMe = await vendorRepository.GetByUserId(userId);
+        if(vendorMe == null)
+        {
+            return BadRequest("Data vendor tidak valid");
+        }
+        
+        vendorMe.User = null;
+
+        return Ok(vendorMe);
+        
     }
 
-    [HttpPost]
+    [HttpPost("update")]
     public async Task<ActionResult<VendorAccount>> Update([FromBody] NewVendorDto form)
     {
-        throw new NotImplementedException();
-        // var user = await SessionTools.GetCurrentUser(userManager, User);
-        // if (user == null)
-        // {
-        //     return BadRequest("user tidak ditemukan, " + user);
-        // }
-        // var vendorAccount = await vendorRepository.GetByUserId(user?.Id ?? "");
-        // if (vendorAccount == null)
-        // {
-        //     var newProfile = new VendorAccount
-        //     {
-        //         Name = form.Name,
-        //         CreatedOn = DateTime.Now,
-        //         UserId = user?.Id ?? "",
-        //         PictPath = "",
-        //     };
-        //     var result = await vendorRepository.Add(newProfile);
-        //     if (result == null)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, "Gagal menyimpan data");
-        //     }
-        //     return Ok(result);
-        // }
-        // else
-        // {
-        //     vendorAccount.Name = form.Name;
-        //     var result = await vendorRepository.Update(vendorAccount);
-        //     if (result == null)
-        //     {
-        //         return StatusCode(StatusCodes.Status500InternalServerError, "Gagal menyimpan data");
-        //     }
-        //     return Ok(result);
-        // }
+        var userId = SessionTools.GetCurrentUserId(User);   
+        var vendorMe = await vendorRepository.GetByUserId(userId);
+        if(vendorMe == null)
+        {
+            return BadRequest("Data vendor tidak valid");
+        }
+        
+        if (vendorMe == null)
+        {
+            var newProfile = new VendorAccount
+            {
+                Name = form.Name,
+                UserId = userId,
+                PictPath = "",
+            };
+            var result = await vendorRepository.Add(newProfile);
+            if (result == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Gagal menyimpan data");
+            }
+            result.User = null;
+            return Ok(result);
+        }
+        else
+        {
+            vendorMe.Name = form.Name;
+            var result = await vendorRepository.Update(vendorMe);
+            if (result == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Gagal menyimpan data");
+            }
+            result.User = null;
+            return Ok(result);
+        }
     }
 }

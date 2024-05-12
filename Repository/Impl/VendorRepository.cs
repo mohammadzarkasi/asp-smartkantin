@@ -14,6 +14,7 @@ public class VendorRepository : IVendorRepository
     }
     public async Task<VendorAccount> Add(VendorAccount item)
     {
+        item.CreatedOn = DateTime.Now.ToUniversalTime();
         await dbContext.AddAsync(item);
         // await this.Save();
         await dbContext.SaveChangesAsync();
@@ -64,6 +65,8 @@ public class VendorRepository : IVendorRepository
     public async Task<VendorAccount> Update(VendorAccount item)
     {
         // throw new NotImplementedException();
+        item.UpdatedOn = DateTime.Now.ToUniversalTime();
+        
         dbContext.Update(item);
         // await Save();
         await dbContext.SaveChangesAsync();
