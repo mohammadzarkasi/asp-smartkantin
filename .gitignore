@@ -4,3 +4,8 @@
 /.vs
 
 .DS_Store
+
+# sqlite file
+*.db
+*.db-shm
+*.db-wal

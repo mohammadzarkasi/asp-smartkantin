@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +22,17 @@ internal class Program
         builder.Services.AddDbContext<DefaultMysqlDbContext>(options =>
         {
             string connStr = builder.Configuration.GetConnectionString("mysql1") ?? "";
-            Console.WriteLine("conn str: " + connStr);
-            options.UseMySQL(connStr);
+            // Console.WriteLine("conn str: " + connStr);
+            // options.UseMySQL(connStr);
+
+            // sqlite
+            // var folder = Environment.CurrentDirectory;
+            // var path = Environment.GetFolderPath(folder);
+            // var path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
+            // var dbPath = System.IO.Path.Join(path, "smart-kantin.db");
+            var dbPath = "./smart-kantin2.db";
+            Console.WriteLine("sqlite db path: " + dbPath);
+            options.UseSqlite("Data Source=" + dbPath);
         });
 
         // config identity / jwt
