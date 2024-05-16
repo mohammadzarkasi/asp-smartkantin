@@ -111,6 +111,15 @@ internal class Program
         });
 
 
+        // daftarkan cors
+        builder.Services.AddCors(opt => {
+            opt.AddDefaultPolicy(b => 
+                b.AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin()
+                
+            );
+        });
 
         // builder.Services.AddControllers();
         builder.Services.AddControllers().AddNewtonsoftJson(opt =>
@@ -175,6 +184,8 @@ internal class Program
         app.UseHttpsRedirection();
 
         app.UseMiddleware<MyJwtAuthMiddleware>();
+
+        app.UseCors();
 
         app.UseAuthentication();
         app.UseAuthorization();

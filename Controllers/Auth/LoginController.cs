@@ -83,4 +83,19 @@ public class LoginController : ControllerBase
         };
         return Ok(l);
     }
+
+    [HttpGet("check")]
+    public IActionResult checkStatusLogin()
+    {
+        var result = new Dictionary<string, bool>();
+        if(User?.Identity?.IsAuthenticated == true)
+        {
+            result.Add("status", true);
+        }
+        else
+        {
+            result.Add("status", false);
+        }
+        return Ok(result);
+    }
 }
